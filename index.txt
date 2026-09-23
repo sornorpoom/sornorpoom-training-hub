@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบบริหารการจัดอบรม - ศธจ.เชียงใหม่</title>
+  
+  <!-- Fonts: Prompt & Sarabun for Academic Minimal Thai Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS & FontAwesome Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Prompt', 'Sarabun', 'sans-serif'],
+            academic: ['Sarabun', 'Prompt', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --font-scale: 1.05;
+    }
+    html {
+      font-size: calc(clamp(14px, 0.35vw + 13.5px, 17px) * var(--font-scale));
+      scroll-behavior: smooth;
+    }
+    body { 
+      font-family: 'Prompt', sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* 🎓 Bright & Vibrant Academic Themes (No dark/black backgrounds) */
+    body.theme-academic { 
+      background-color: #f0f6ff; 
+      color: #0f172a; 
+    }
+    body.theme-academic header { 
+      background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #0284c7 100%); 
+    }
+    body.theme-academic #adminStatusBar {
+      background: #1e3a8a;
+      border-color: #3b82f6;
+    }
+    body.theme-academic .card-academic { 
+      background-color: #ffffff; 
+      border-color: #e0e7ff; 
+    }
+
+    body.theme-forest { 
+      background-color: #f0fdf4; 
+      color: #064e3b; 
+    }
+    body.theme-forest header { 
+      background: linear-gradient(135deg, #047857 0%, #059669 50%, #0d9488 100%); 
+    }
+    body.theme-forest #adminStatusBar {
+      background: #065f46;
+      border-color: #10b981;
+    }
+    body.theme-forest .card-academic { 
+      background-color: #ffffff; 
+      border-color: #d1fae5; 
+    }
+
+    body.theme-warm { 
+      background-color: #fff7ed; 
+      color: #431407; 
+    }
+    body.theme-warm header { 
+      background: linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #d97706 100%); 
+    }
+    body.theme-warm #adminStatusBar {
+      background: #9a3412;
+      border-color: #f97316;
+    }
+    body.theme-warm .card-academic { 
+      background-color: #ffffff; 
+      border-color: #fed7aa; 
+    }
+
+    .course-card {
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .course-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px -8px rgba(15, 23, 42, 0.07);
+      border-color: #cbd5e1;
+    }
+
+    /* Custom Scrollbar for Form */
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+
+<body class="theme-academic min-h-screen flex flex-col antialiased selection:bg-slate-800 selection:text-white">
+
+  <!-- ==================== HEADER (Academic Minimal) ==================== -->
+  <header class="text-white shadow-lg border-b border-slate-700/50 sticky top-0 z-40 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between py-3.5 sm:py-4 gap-4">
+        
+        <!-- Left: Branding & Organization Info -->
+        <div class="flex items-center gap-3.5">
+          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0 shadow-inner backdrop-blur-sm">
+            <i class="fa-solid fa-graduation-cap text-xl sm:text-2xl text-amber-300"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-base sm:text-lg font-bold tracking-tight text-white leading-tight">
+                ระบบบริหารการจัดอบรม
+              </h1>
+              <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                Hub Portal
+              </span>
+            </div>
+            <p class="text-xs text-slate-300 font-light flex items-center gap-1.5 mt-0.5">
+              <span>กลุ่มงานนิเทศ ติดตาม และประเมินผลการจัดการศึกษา ศธจ.เชียงใหม่</span>
+              <span class="opacity-60 hidden md:inline">• นวัตกรรมโดย ศน.รัชภูมิ สมสมัย</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Right: Controls (Theme, Font, Refresh, Admin) -->
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+          
+          <!-- Quick Refresh Button in Header -->
+          <button onclick="fetchData()" id="headerRefreshBtn" class="px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-medium border border-white/15 transition flex items-center gap-1.5 active:scale-95" title="รีเฟรชข้อมูลจาก Google Sheet">
+            <i class="fa-solid fa-rotate text-xs"></i>
+            <span class="hidden md:inline">รีเฟรช</span>
+          </button>
+
+          <!-- Font Scale -->
+          <div class="hidden sm:flex items-center bg-white/10 rounded-xl p-0.5 border border-white/15 text-xs">
+            <button onclick="setFontScale('small')" id="btn-font-sm" class="px-2 py-1 rounded-lg text-white/70 hover:text-white transition" title="ตัวอักษรขนาดกะทัดรัด">ก-</button>
+            <button onclick="setFontScale('normal')" id="btn-font-md" class="px-2 py-1 rounded-lg bg-white/20 font-bold text-white transition" title="ตัวอักษรขนาดมาตรฐาน">ก</button>
+            <button onclick="setFontScale('large')" id="btn-font-lg" class="px-2 py-1 rounded-lg text-white/70 hover:text-white transition" title="ตัวอักษรขนาดใหญ่">ก+</button>
+          </div>
+
+          <!-- Academic Theme Switcher -->
+          <div class="flex items-center bg-white/10 rounded-xl p-0.5 border border-white/15 text-xs">
+            <button onclick="setAppTheme('academic')" id="btn-thm-academic" class="px-2 py-1 rounded-lg bg-white/20 font-medium text-white transition" title="ธีมวิชาการ">🏛️</button>
+            <button onclick="setAppTheme('forest')" id="btn-thm-forest" class="px-2 py-1 rounded-lg text-white/70 hover:text-white transition" title="ธีมธรรมชาติ">🌿</button>
+            <button onclick="setAppTheme('warm')" id="btn-thm-warm" class="px-2 py-1 rounded-lg text-white/70 hover:text-white transition" title="ธีมอบอุ่น">☕</button>
+          </div>
+
+          <!-- Admin Portal Button -->
+          <button onclick="openAdminModal()" class="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs sm:text-sm font-bold shadow-md transition flex items-center gap-1.5 active:scale-95">
+            <i class="fa-solid fa-lock text-xs"></i>
+            <span id="adminBtnLabel">ผู้ดูแลระบบ</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== ADMIN ACTION BAR (Shown when Logged In) ==================== -->
+  <div id="adminStatusBar" class="hidden bg-slate-900 text-white border-b border-slate-800 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="font-medium text-slate-200">โหมดผู้ดูแลระบบ: ศน.รัชภูมิ สมสมัย</span>
+        <span class="text-slate-400 hidden sm:inline">(Google Sheet Tab: Training Course)</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="openNewCourseForm()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-semibold transition flex items-center gap-1.5 shadow-sm">
+          <i class="fa-solid fa-plus-circle"></i> บันทึกหลักสูตรใหม่
+        </button>
+        <button onclick="openEditCourseSelector()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-lg font-semibold transition flex items-center gap-1.5 shadow-sm" title="เลือกหลักสูตรเพื่อแก้ไข">
+          <i class="fa-solid fa-pen-to-square"></i> แก้ไขหลักสูตร
+        </button>
+        <button onclick="openApiConfigModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition" title="ตั้งค่า Web App API URL">
+          <i class="fa-solid fa-gear"></i>
+        </button>
+        <button onclick="fetchData()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition" title="รีเฟรชข้อมูล">
+          <i class="fa-solid fa-rotate"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+
+    <!-- Loading Spinner -->
+    <div id="loading" class="py-20 text-center space-y-3">
+      <div class="inline-block w-9 h-9 border-3 border-slate-300 border-t-slate-800 rounded-full animate-spin"></div>
+      <p class="text-xs text-slate-500 font-medium">กำลังโหลดข้อมูลทะเบียนหลักสูตรการอบรม...</p>
+    </div>
+
+    <!-- Content Area -->
+    <div id="contentArea" class="hidden space-y-6">
+
+      <!-- ==================== HEADER SUMMARY BANNER (With Refresh & Course Count Buttons) ==================== -->
+      <div class="card-academic rounded-3xl p-5 sm:p-6 border shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="space-y-1.5 flex-1">
+          <div class="flex items-center gap-2 flex-wrap">
+            
+            <!-- 📊 ปุ่มแสดงจำนวนหลักสูตร (Interactive Course Count Button) -->
+            <button onclick="resetCourseFilters()" id="btnCourseCountBadge" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white border border-blue-400/50 transition flex items-center gap-1.5 shadow-sm active:scale-95" title="คลิกเพื่อแสดงหลักสูตรทั้งหมด">
+              <i class="fa-solid fa-layer-group text-amber-300"></i>
+              <span id="statCourseCount">0 หลักสูตร</span>
+            </button>
+
+            <!-- Status Breakdown Badges -->
+            <span id="statOpenCountBadge" onclick="setQuickStatusFilter('open')" class="cursor-pointer px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition flex items-center gap-1.5 shadow-2xs">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> เปิดอบรม <strong id="statOpenCount">0</strong>
+            </span>
+            <span id="statCompletedCountBadge" onclick="setQuickStatusFilter('completed')" class="cursor-pointer px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition flex items-center gap-1.5 shadow-2xs">
+              <span class="w-2 h-2 rounded-full bg-slate-400"></span> เสร็จสิ้น <strong id="statCompletedCount">0</strong>
+            </span>
+
+            <!-- 🔄 ปุ่มรีเฟรชข้อมูล (Refresh Button) -->
+            <button onclick="fetchData()" id="bannerRefreshBtn" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 hover:text-blue-900 transition flex items-center gap-1.5 shadow-2xs active:scale-95" title="ดึงข้อมูลล่าสุดจาก Google Sheet ทันที">
+              <i class="fa-solid fa-rotate text-blue-600"></i>
+              <span>รีเฟรชข้อมูล</span>
+            </button>
+          </div>
+
+          <h2 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight pt-1">
+            ทะเบียนหลักสูตรการอบรม (Training Courses)
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-600 font-normal">
+            รวบรวมข้อมูลหลักสูตร ลิงก์รับสมัคร เอกสารประกอบการบรรยาย ตรวจสอบรายชื่อ และพิมพ์เกียรติบัตรออนไลน์
+          </p>
+        </div>
+      </div>
+
+      <!-- ==================== SEARCH & FILTERS BAR ==================== -->
+      <div class="card-academic rounded-2xl p-4 border shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        
+        <!-- Search Input -->
+        <div class="relative flex-1 max-w-md">
+          <input type="text" id="courseSearchInput" oninput="filterCourses()" placeholder="ค้นหาชื่อหลักสูตร, กลุ่มเป้าหมาย, หรือสถานที่..." class="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-slate-800 focus:bg-white transition">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+        </div>
+
+        <!-- Filter Dropdowns & Controls -->
+        <div class="flex items-center gap-2 flex-wrap text-xs">
+          <!-- Type Filter -->
+          <div class="flex items-center gap-1 bg-slate-50 px-2 py-1 rounded-xl border border-slate-200">
+            <span class="text-slate-400 text-[11px]">รูปแบบ:</span>
+            <select id="typeFilter" onchange="filterCourses()" class="bg-transparent font-medium text-slate-700 outline-none cursor-pointer">
+              <option value="all">ทุกรูปแบบ</option>
+              <option value="online">Online</option>
+              <option value="onsite">Onsite</option>
+              <option value="hybrid">Hybrid</option>
+            </select>
+          </div>
+
+          <!-- Status Filter -->
+          <div class="flex items-center gap-1 bg-slate-50 px-2 py-1 rounded-xl border border-slate-200">
+            <span class="text-slate-400 text-[11px]">สถานะ:</span>
+            <select id="statusFilter" onchange="filterCourses()" class="bg-transparent font-medium text-slate-700 outline-none cursor-pointer">
+              <option value="all">ทุกสถานะ</option>
+              <option value="open">เปิดการอบรม</option>
+              <option value="completed">อบรมเสร็จแล้ว</option>
+            </select>
+          </div>
+
+          <!-- Sort Order -->
+          <button onclick="toggleSortOrder()" id="sortOrderBtn" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium transition flex items-center gap-1.5 border border-slate-200" title="สลับลำดับการเรียง">
+            <i class="fa-solid fa-arrow-down-wide-short"></i>
+            <span id="sortOrderLabel">เรียงวันที่ (ล่าสุดก่อน)</span>
+          </button>
+
+          <!-- Refresh Button in Filter Bar -->
+          <button onclick="fetchData()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium transition flex items-center gap-1 border border-slate-200" title="รีเฟรชข้อมูล">
+            <i class="fa-solid fa-rotate"></i>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ==================== COURSE CARDS LIST CONTAINER ==================== -->
+      <div id="courseList" class="space-y-4"></div>
+
+    </div>
+
+  </main>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="card-academic border-t border-slate-200/80 py-6 text-center text-xs text-slate-500 space-y-1.5 mt-12">
+    <div class="max-w-7xl mx-auto px-4 space-y-1">
+      <p class="font-semibold text-slate-800 text-xs sm:text-sm">
+        © ระบบบริหารการจัดอบรม • นวัตกรรมโดย ศน.รัชภูมิ สมสมัย
+      </p>
+      <p class="text-xs text-slate-500 font-normal">
+        กลุ่มงานนิเทศ ติดตาม และประเมินผลการจัดการศึกษา สำนักงานศึกษาธิการจังหวัดเชียงใหม่
+      </p>
+    </div>
+  </footer>
+
+  <!-- ==================== HORIZONTAL ADMIN COURSE ENTRY / EDIT MODAL ==================== -->
+  <div id="courseModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+    <div class="card-academic w-full max-w-5xl rounded-3xl shadow-2xl border p-5 sm:p-7 space-y-4 my-auto custom-scroll max-h-[92vh] overflow-y-auto">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3.5">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center text-sm font-bold">
+            <i class="fa-solid fa-pen-nib"></i>
+          </div>
+          <div>
+            <h3 id="modalFormTitle" class="text-base sm:text-lg font-bold text-slate-900 leading-tight">
+              บันทึกข้อมูลหลักสูตรการอบรม (Training Course)
+            </h3>
+            <p class="text-[11px] text-slate-500 font-light">
+              กรอกข้อมูลให้ครบถ้วน ข้อมูลจะถูกบันทึกลง Google Sheet tab "Training Course" โดยอัตโนมัติ
+            </p>
+          </div>
+        </div>
+        <button onclick="closeCourseModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition">
+          ✕
+        </button>
+      </div>
+
+      <!-- FORM IN WIDE HORIZONTAL LAYOUT -->
+      <form id="courseForm" onsubmit="handleFormSubmit(event)" class="space-y-4 text-xs sm:text-sm">
+        
+        <input type="hidden" id="formRowId" value="">
+        <input type="hidden" id="formOriginalTopic" value="">
+
+        <!-- TOP SECTION: 2 COLUMNS (General Info & Location/Google Maps) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
+          
+          <!-- LEFT COLUMN: Course General Details (7 cols) -->
+          <div class="lg:col-span-7 space-y-3.5 bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80">
+            <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5 pb-1 border-b border-slate-200">
+              <i class="fa-solid fa-circle-info text-slate-600"></i> ข้อมูลหลักสูตร (General Info)
+            </h4>
+
+            <!-- Topic -->
+            <div>
+              <label class="block font-semibold mb-1 text-slate-800">
+                1. ชื่อหลักสูตร / กิจกรรม (Topic) <span class="text-rose-500">*</span>
+              </label>
+              <input type="text" id="formTopic" required placeholder="ระบุชื่อหลักสูตร เช่น การพัฒนาสมรรถนะครูด้านการจัดการเรียนรู้เชิงรุก (Active Learning)" class="w-full px-3 py-2 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-slate-800 bg-white font-medium transition">
+            </div>
+
+            <!-- Target -->
+            <div>
+              <label class="block font-semibold mb-1 text-slate-800">
+                2. กลุ่มเป้าหมาย (Target) <span class="text-rose-500">*</span>
+              </label>
+              <input type="text" id="formTarget" required placeholder="เช่น ครูผู้สอนสังกัด สพฐ., ผู้บริหารสถานศึกษา, บุคลากรทางการศึกษา..." class="w-full px-3 py-2 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-slate-800 bg-white transition">
+            </div>
+
+            <!-- Date & Time Row -->
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+              <!-- Date Picker -->
+              <div class="sm:col-span-6">
+                <label class="block font-semibold mb-1 flex items-center justify-between text-slate-800">
+                  <span>3. วัน เดือน ปี (Date) <span class="text-rose-500">*</span></span>
+                  <span id="datePreviewLabel" class="text-slate-500 font-normal text-[10px]"></span>
+                </label>
+                <input type="date" id="formDatePicker" required onchange="updateDatePreview()" class="w-full px-3 py-2 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-slate-800 bg-white cursor-pointer">
+              </div>
+
+              <!-- Start & End Time -->
+              <div class="sm:col-span-6 grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block font-semibold mb-1 text-slate-800 text-xs">เวลาเริ่ม</label>
+                  <select id="formStartTime24" required class="w-full px-2 py-2 border border-slate-300 rounded-xl bg-white outline-none text-xs"></select>
+                </div>
+                <div>
+                  <label class="block font-semibold mb-1 text-slate-800 text-xs">เวลาสิ้นสุด</label>
+                  <select id="formEndTime24" required class="w-full px-2 py-2 border border-slate-300 rounded-xl bg-white outline-none text-xs"></select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Type & Status Row -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-semibold mb-1 text-slate-800">4. รูปแบบ (Type) <span class="text-rose-500">*</span></label>
+                <select id="formType" onchange="handleTypeChange(this.value)" class="w-full px-3 py-2 border border-slate-300 rounded-xl bg-white outline-none font-medium">
+                  <option value="online">🌐 Online (ออนไลน์)</option>
+                  <option value="onsite">🏛️ Onsite (ณ สถานที่)</option>
+                  <option value="hybrid">🔄 Hybrid (ผสมผสาน)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-semibold mb-1 text-slate-800">5. สถานะ (Status) <span class="text-rose-500">*</span></label>
+                <select id="formStatus" class="w-full px-3 py-2 border border-slate-300 rounded-xl bg-white outline-none font-medium">
+                  <option value="เปิดการอบรม">🟢 เปิดการอบรม (Open)</option>
+                  <option value="อบรมเสร็จแล้ว">⚪ อบรมเสร็จแล้ว (Closed)</option>
+                </select>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT COLUMN: Place & Live Google Map Embed (5 cols) -->
+          <div class="lg:col-span-5 space-y-2.5 bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80 flex flex-col justify-between">
+            <div>
+              <label class="block font-semibold mb-1 text-slate-900 flex items-center justify-between">
+                <span class="flex items-center gap-1.5"><i class="fa-solid fa-map-location-dot text-rose-600"></i> 6. สถานที่ (Place / Google Map)</span>
+                <span class="text-[10px] text-slate-500 font-normal">ค้นหาบนแผนที่</span>
+              </label>
+
+              <!-- Search Bar -->
+              <div class="flex gap-1.5">
+                <input type="text" id="formPlace" oninput="debounceUpdateMap(this.value)" value="ออนไลน์ (Online)" placeholder="ระบุชื่อสถานที่ เช่น สำนักงานศึกษาธิการจังหวัดเชียงใหม่" class="flex-1 px-3 py-2 border border-slate-300 rounded-xl text-xs bg-white outline-none focus:ring-2 focus:ring-slate-800 transition">
+                <button type="button" onclick="searchGoogleMap()" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-medium shrink-0 transition flex items-center gap-1 shadow-sm">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+                <a id="openGMapBtn" href="https://www.google.com/maps" target="_blank" class="px-2.5 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-xl text-xs font-medium shrink-0 transition flex items-center" title="เปิด Google Maps">
+                  <i class="fa-brands fa-google text-rose-500"></i>
+                </a>
+              </div>
+
+              <!-- Quick Presets -->
+              <div class="flex items-center gap-1 flex-wrap pt-2">
+                <span class="text-[10px] text-slate-400 font-medium">แนะนำ:</span>
+                <button type="button" onclick="setQuickPlace('สำนักงานศึกษาธิการจังหวัดเชียงใหม่')" class="text-[10px] px-2 py-0.5 bg-white hover:bg-slate-200 border border-slate-200 rounded-md text-slate-700 transition">ศธจ.เชียงใหม่</button>
+                <button type="button" onclick="setQuickPlace('โรงแรมคุ้มภูคำ เชียงใหม่')" class="text-[10px] px-2 py-0.5 bg-white hover:bg-slate-200 border border-slate-200 rounded-md text-slate-700 transition">รร.คุ้มภูคำ</button>
+                <button type="button" onclick="setQuickPlace('โรงแรมเชียงใหม่ออคิด')" class="text-[10px] px-2 py-0.5 bg-white hover:bg-slate-200 border border-slate-200 rounded-md text-slate-700 transition">รร.เชียงใหม่ออคิด</button>
+                <button type="button" onclick="setQuickPlace('ออนไลน์ (Online)')" class="text-[10px] px-2 py-0.5 bg-white hover:bg-slate-200 border border-slate-200 rounded-md text-slate-700 transition">ออนไลน์</button>
+              </div>
+            </div>
+
+            <!-- Live Google Map Iframe -->
+            <div id="googleMapWrapper" class="w-full h-44 sm:h-48 rounded-xl overflow-hidden border border-slate-300 shadow-inner bg-slate-200 relative mt-2">
+              <iframe id="googleMapIframe" class="w-full h-full border-0" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=%E0%B8%AA%E0%B8%B3%E0%B8%99%E0%B8%B1%E0%B8%81%E0%B8%87%E0%B8%B2%E0%B8%99%E0%B8%A8%E0%B8%B6%E0%B8%81%E0%B8%A9%E0%B8%B2%E0%B8%98%E0%B8%B4%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%88%E0%B8%B1%E0%B8%87%E0%B8%AB%E0%B8%A7%E0%B8%B1%E0%B8%94%E0%B9%80%E0%B8%8A%E0%B8%B5%E0%B8%A2%E0%B8%87%E0%B9%83%E0%B8%8HM&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+              <div id="onlinePlaceHint" class="hidden absolute inset-0 bg-slate-900/85 text-white flex flex-col items-center justify-center text-center p-3">
+                <i class="fa-solid fa-laptop-code text-2xl mb-1.5 text-blue-400"></i>
+                <span class="text-xs font-semibold">การอบรมรูปแบบออนไลน์ (Online)</span>
+                <span class="text-[10px] text-slate-300">ระบบบันทึกเป็น "ออนไลน์ (Online)"</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- BOTTOM SECTION: LINKS & RESOURCES (4 HORIZONTAL CARDS IN EXACT USER-REQUESTED ORDER) -->
+        <div class="space-y-2 bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80">
+          <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5 pb-1 border-b border-slate-200">
+            <i class="fa-solid fa-link text-slate-600"></i> ลิงก์ระบบที่เกี่ยวข้อง (System URLs & Resources)
+          </h4>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+            
+            <!-- 1. Link Registration -->
+            <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+              <label class="block font-semibold text-xs text-blue-800 flex items-center gap-1">
+                <i class="fa-solid fa-user-plus"></i> ลิงก์สมัครอบรม
+              </label>
+              <input type="url" id="formLinkRegistration" placeholder="https://forms.gle/..." class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-blue-600 bg-slate-50/50">
+            </div>
+
+            <!-- 2. Link Names -->
+            <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+              <label class="block font-semibold text-xs text-amber-800 flex items-center gap-1">
+                <i class="fa-solid fa-list-check"></i> ลิงก์ตรวจสอบรายชื่อ
+              </label>
+              <input type="url" id="formLinkName" placeholder="https://docs.google.com/..." class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-amber-600 bg-slate-50/50">
+            </div>
+
+            <!-- 3. Link Materials (3 URLs) -->
+            <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+              <label class="block font-semibold text-xs text-purple-800 flex items-center justify-between">
+                <span class="flex items-center gap-1"><i class="fa-solid fa-file-lines"></i> ลิงก์เอกสาร (3 URL)</span>
+                <span class="text-[9px] text-slate-400 font-normal">ไม่บังคับ</span>
+              </label>
+              <div class="space-y-1">
+                <input type="url" id="formLinkMaterial1" placeholder="URL 1: สไลด์บรรยาย..." class="w-full px-2.5 py-1 border border-slate-200 rounded-md text-[11px] outline-none focus:ring-1 focus:ring-purple-600 bg-slate-50/50">
+                <input type="url" id="formLinkMaterial2" placeholder="URL 2: เอกสารเสริม..." class="w-full px-2.5 py-1 border border-slate-200 rounded-md text-[11px] outline-none focus:ring-1 focus:ring-purple-600 bg-slate-50/50">
+                <input type="url" id="formLinkMaterial3" placeholder="URL 3: แหล่งอ้างอิง..." class="w-full px-2.5 py-1 border border-slate-200 rounded-md text-[11px] outline-none focus:ring-1 focus:ring-purple-600 bg-slate-50/50">
+              </div>
+            </div>
+
+            <!-- 4. Link Certificate -->
+            <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+              <label class="block font-semibold text-xs text-emerald-800 flex items-center gap-1">
+                <i class="fa-solid fa-award"></i> ลิงก์รับเกียรติบัตร
+              </label>
+              <input type="url" id="formLinkCertificated" value="https://script.google.com/macros/s/AKfycbwEKynG_L-2HeuEU3PzlTu8he1PzAK2AGS_b3RRlk-pFDy6WrwuwwTQVZArG8NI-fbS/exec" class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-emerald-600 bg-slate-50/50 text-slate-700">
+            </div>
+
+          </div>
+        </div>
+
+        <!-- FORM ACTION BUTTONS -->
+        <div class="pt-2 flex items-center justify-end gap-2.5 border-t border-slate-100">
+          <button type="button" onclick="closeCourseModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium transition text-xs sm:text-sm">
+            ยกเลิก
+          </button>
+          <button type="submit" id="saveCourseSubmitBtn" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-md transition flex items-center justify-center gap-2 text-xs sm:text-sm active:scale-95">
+            <i class="fa-solid fa-cloud-arrow-up"></i> บันทึกลง Google Sheet
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+  <script>
+    // State Variables
+    let currentAdminPin = null;
+    let allCoursesData = [];
+    let sortAscending = false; // false = newest date first
+    let mapDebounceTimer = null;
+
+    const SPREADSHEET_ID = '14ZTGU9GJXXE0Kld8DSeeMG8wCQxooDgyIB2qKhKol-I';
+    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbwmirtLgrcLXwddAtvOjHaUivrmWz_y9xofAt18972A65REyfBZBvN7AKJ7cuouTRIH/exec';
+    let gasApiUrl = localStorage.getItem('TRAINING_GAS_API_URL') || DEFAULT_GAS_URL;
+
+    function isGasEnvironment() {
+      return (typeof google !== 'undefined' && google.script && google.script.run);
+    }
+
+    // 🕒 Init 24-Hour Time Dropdowns
+    function initTime24Dropdowns() {
+      const startSelect = document.getElementById('formStartTime24');
+      const endSelect = document.getElementById('formEndTime24');
+      if (!startSelect || !endSelect) return;
+      startSelect.innerHTML = '';
+      endSelect.innerHTML = '';
+
+      for (let h = 0; h < 24; h++) {
+        for (let m of ['00', '30']) {
+          const hh = h.toString().padStart(2, '0');
+          const timeVal = `${hh}:${m}`;
+          startSelect.add(new Option(timeVal, timeVal));
+          endSelect.add(new Option(timeVal, timeVal));
+        }
+      }
+      startSelect.value = "13:00";
+      endSelect.value = "16:00";
+    }
+
+    // 📅 Thai Date Formatter & Parser
+    const THAI_MONTHS = [
+      "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+      "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+    ];
+
+    function formatThaiDateString(isoDate) {
+      if (!isoDate) return '';
+      const parts = isoDate.split('-');
+      if (parts.length !== 3) return isoDate;
+      const year = parseInt(parts[0], 10) + 543;
+      const month = THAI_MONTHS[parseInt(parts[1], 10) - 1] || '';
+      const day = parseInt(parts[2], 10);
+      return `${day} ${month} ${year}`;
+    }
+
+    function parseThaiDateToTimestamp(dateStr) {
+      if (!dateStr) return 0;
+      try {
+        let cleanStr = dateStr.split('เวลา')[0].trim();
+        for (let m = 0; m < THAI_MONTHS.length; m++) {
+          if (cleanStr.includes(THAI_MONTHS[m])) {
+            const parts = cleanStr.split(THAI_MONTHS[m]);
+            const day = parseInt(parts[0].replace(/\D/g, ''), 10) || 1;
+            let year = parseInt(parts[1].replace(/\D/g, ''), 10) || 2569;
+            if (year > 2400) year -= 543;
+            return new Date(year, m, day).getTime();
+          }
+        }
+        const isoParsed = Date.parse(dateStr);
+        if (!isNaN(isoParsed)) return isoParsed;
+      } catch (e) {}
+      return 0;
+    }
+
+    function updateDatePreview() {
+      const dateVal = document.getElementById('formDatePicker').value;
+      const preview = document.getElementById('datePreviewLabel');
+      preview.innerText = dateVal ? `(${formatThaiDateString(dateVal)})` : '';
+    }
+
+    // 🗺️ Google Maps Embed & Search
+    function updateGoogleMapEmbed(query) {
+      const iframe = document.getElementById('googleMapIframe');
+      const openBtn = document.getElementById('openGMapBtn');
+      const onlineHint = document.getElementById('onlinePlaceHint');
+      const cleanQuery = (query || '').trim();
+
+      if (!cleanQuery || cleanQuery === 'ออนไลน์ (Online)' || cleanQuery.toLowerCase() === 'online') {
+        if (onlineHint) onlineHint.classList.remove('hidden');
+        if (openBtn) openBtn.href = 'https://www.google.com/maps';
+        return;
+      }
+
+      if (onlineHint) onlineHint.classList.add('hidden');
+      
+      const searchQuery = (cleanQuery.includes('เชียงใหม่') || cleanQuery.startsWith('http')) 
+        ? cleanQuery 
+        : `${cleanQuery} เชียงใหม่`;
+      
+      const embedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(searchQuery)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+      if (iframe) iframe.src = embedUrl;
+
+      if (openBtn) {
+        openBtn.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanQuery)}`;
+      }
+    }
+
+    function searchGoogleMap() {
+      const val = document.getElementById('formPlace').value;
+      updateGoogleMapEmbed(val);
+    }
+
+    function debounceUpdateMap(val) {
+      clearTimeout(mapDebounceTimer);
+      mapDebounceTimer = setTimeout(() => {
+        updateGoogleMapEmbed(val);
+      }, 500);
+    }
+
+    function setQuickPlace(placeName) {
+      const input = document.getElementById('formPlace');
+      input.value = placeName;
+      updateGoogleMapEmbed(placeName);
+    }
+
+    function handleTypeChange(val) {
+      const placeInput = document.getElementById('formPlace');
+      if (val === 'online') {
+        placeInput.value = 'ออนไลน์ (Online)';
+      } else {
+        if (placeInput.value === 'ออนไลน์ (Online)') {
+          placeInput.value = 'สำนักงานศึกษาธิการจังหวัดเชียงใหม่';
+        }
+      }
+      updateGoogleMapEmbed(placeInput.value);
+    }
+
+    // 🚀 Robust Data Fetching (GAS Engine + Direct Google Sheets GViz)
+    async function fetchFromGoogleSheetsDirect() {
+      try {
+        const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=${encodeURIComponent('Training Course')}&tqx=out:json&t=${Date.now()}`;
+        const res = await fetch(url);
+        const text = await res.text();
+        const jsonMatch = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/);
+        if (!jsonMatch || !jsonMatch[1]) return null;
+        const data = JSON.parse(jsonMatch[1]);
+        if (!data.table || !data.table.rows) return null;
+
+        const courses = [];
+        const rows = data.table.rows.map(r => (r.c || []).map(cell => (cell && cell.v !== null && cell.v !== undefined) ? cell.v : ''));
+        const startIdx = (rows.length > 0 && String(rows[0][1]).trim() === 'Topic') ? 1 : 0;
+
+        for (let i = startIdx; i < rows.length; i++) {
+          const row = rows[i];
+          if (!row || !row[1] || String(row[1]).trim() === '' || String(row[1]).trim() === 'Topic') continue;
+
+          const rawMaterials = String(row[7] || '');
+          const materialLinks = rawMaterials
+            .split(/[\n,]+/)
+            .map(s => s.trim())
+            .filter(s => s.startsWith('http://') || s.startsWith('https://'));
+
+          courses.push({
+            rowId: i + 1,
+            timestamp: row[0] || '',
+            topic: String(row[1] || '').trim(),
+            target: String(row[2] || 'ครูและบุคลากรทางการศึกษา').trim(),
+            date: String(row[3] || '-').trim(),
+            type: String(row[4] || 'online').toLowerCase().trim(),
+            place: String(row[5] || 'ออนไลน์ (Online)').trim(),
+            status: String(row[6] || 'เปิดการอบรม').trim(),
+            linkMaterials: materialLinks,
+            linkMaterialsRaw: rawMaterials,
+            linkRegistration: String(row[8] || '').trim(),
+            linkName: String(row[9] || '').trim(),
+            linkCertificated: String(row[10] || '').trim() || 'https://script.google.com/macros/s/AKfycbwEKynG_L-2HeuEU3PzlTu8he1PzAK2AGS_b3RRlk-pFDy6WrwuwwTQVZArG8NI-fbS/exec'
+          });
+        }
+
+        return { success: true, courses: courses };
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function fetchData() {
+      // Spinning icons on refresh buttons
+      document.querySelectorAll('#headerRefreshBtn i, #bannerRefreshBtn i').forEach(icon => {
+        icon.classList.add('fa-spin');
+      });
+
+      document.getElementById('loading').classList.remove('hidden');
+      document.getElementById('contentArea').classList.add('hidden');
+
+      const onFetchComplete = () => {
+        document.querySelectorAll('#headerRefreshBtn i, #bannerRefreshBtn i').forEach(icon => {
+          icon.classList.remove('fa-spin');
+        });
+      };
+
+      if (isGasEnvironment()) {
+        google.script.run
+          .withSuccessHandler((res) => {
+            onFetchComplete();
+            renderData(res);
+          })
+          .withFailureHandler(async (err) => {
+            const fallback = await fetchFromGoogleSheetsDirect();
+            onFetchComplete();
+            if (fallback && fallback.courses.length > 0) {
+              renderData(fallback);
+            } else {
+              document.getElementById('loading').classList.add('hidden');
+              document.getElementById('contentArea').classList.remove('hidden');
+              Swal.fire({ icon: 'error', title: 'เชื่อมต่อล้มเหลว', text: err.message || err.toString() });
+            }
+          })
+          .getTrainingPortalData();
+      } else {
+        const directData = await fetchFromGoogleSheetsDirect();
+        if (directData && directData.courses.length > 0) {
+          onFetchComplete();
+          renderData(directData);
+        } else {
+          const fetchUrl = gasApiUrl.includes('?') 
+            ? `${gasApiUrl}&action=getData&t=${Date.now()}` 
+            : `${gasApiUrl}?action=getData&t=${Date.now()}`;
+          
+          fetch(fetchUrl)
+            .then(res => res.json())
+            .then(data => {
+              onFetchComplete();
+              renderData(data);
+            })
+            .catch(() => {
+              onFetchComplete();
+              if (directData) renderData(directData);
+              else renderData({ success: true, courses: [] });
+            });
+        }
+      }
+    }
+
+    function renderData(res) {
+      document.getElementById('loading').classList.add('hidden');
+      if (!res || !res.success) {
+        Swal.fire({ icon: 'error', title: 'ข้อผิดพลาด', text: res ? res.message : 'ไม่สามารถดึงข้อมูลได้' });
+        return;
+      }
+      document.getElementById('contentArea').classList.remove('hidden');
+
+      allCoursesData = res.courses || [];
+
+      // Update counters in Header Banner
+      const openCount = allCoursesData.filter(c => c.status === 'เปิดการอบรม' || c.status === 'open').length;
+      const completedCount = allCoursesData.length - openCount;
+      
+      document.getElementById('statCourseCount').innerText = `${allCoursesData.length} หลักสูตร`;
+      document.getElementById('statOpenCount').innerText = openCount;
+      document.getElementById('statCompletedCount').innerText = completedCount;
+
+      filterCourses();
+    }
+
+    // 🔍 Search, Filter, and Chronological Sort
+    function toggleSortOrder() {
+      sortAscending = !sortAscending;
+      const label = document.getElementById('sortOrderLabel');
+      label.innerText = sortAscending ? 'เรียงวันที่ (เก่าไปใหม่)' : 'เรียงวันที่ (ล่าสุดก่อน)';
+      filterCourses();
+    }
+
+    function setQuickStatusFilter(status) {
+      document.getElementById('statusFilter').value = status;
+      filterCourses();
+    }
+
+    function resetCourseFilters() {
+      document.getElementById('courseSearchInput').value = '';
+      document.getElementById('typeFilter').value = 'all';
+      document.getElementById('statusFilter').value = 'all';
+      filterCourses();
+    }
+
+    function filterCourses() {
+      const search = (document.getElementById('courseSearchInput').value || '').toLowerCase().trim();
+      const typeFilter = document.getElementById('typeFilter').value;
+      const statusFilter = document.getElementById('statusFilter').value;
+
+      let filtered = allCoursesData.filter(c => {
+        const matchSearch = !search || 
+          (c.topic && c.topic.toLowerCase().includes(search)) || 
+          (c.target && c.target.toLowerCase().includes(search)) ||
+          (c.place && c.place.toLowerCase().includes(search));
+        
+        const matchType = (typeFilter === 'all') || (c.type === typeFilter);
+
+        let matchStatus = true;
+        if (statusFilter === 'open') {
+          matchStatus = (c.status === 'เปิดการอบรม' || c.status === 'open');
+        } else if (statusFilter === 'completed') {
+          matchStatus = (c.status === 'อบรมเสร็จแล้ว' || c.status === 'closed' || c.status === 'close' || c.status === 'completed');
+        }
+
+        return matchSearch && matchType && matchStatus;
+      });
+
+      // Sort Chronologically by Date
+      filtered.sort((a, b) => {
+        const timeA = parseThaiDateToTimestamp(a.date);
+        const timeB = parseThaiDateToTimestamp(b.date);
+        return sortAscending ? (timeA - timeB) : (timeB - timeA);
+      });
+
+      renderCourseList(filtered);
+    }
+
+    function renderCourseList(courses) {
+      const listContainer = document.getElementById('courseList');
+      listContainer.innerHTML = '';
+
+      if (courses.length === 0) {
+        listContainer.innerHTML = `
+          <div class="card-academic rounded-3xl p-12 text-center text-slate-400 space-y-3 border">
+            <i class="fa-regular fa-folder-open text-4xl text-slate-300"></i>
+            <p class="text-sm font-semibold text-slate-700">ไม่พบรายการหลักสูตรที่ตรงกับเงื่อนไข</p>
+            <div class="flex justify-center gap-2 pt-1">
+              <button onclick="resetCourseFilters()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition">
+                ล้างตัวกรองทั้งหมด
+              </button>
+              <button onclick="fetchData()" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1">
+                <i class="fa-solid fa-rotate text-xs"></i> รีเฟรชข้อมูล
+              </button>
+            </div>
+          </div>`;
+        return;
+      }
+
+      courses.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = "card-academic course-card rounded-2xl p-4 sm:p-5 border shadow-xs space-y-3.5";
+
+        const isOpen = (item.status === 'เปิดการอบรม' || item.status === 'open');
+        const statusBadge = isOpen 
+          ? '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> เปิดการอบรม</span>'
+          : '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> อบรมเสร็จแล้ว</span>';
+
+        let typeBadge = '';
+        if (item.type === 'online') {
+          typeBadge = '<span class="text-xs text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-lg font-medium border border-blue-200/70"><i class="fa-solid fa-globe mr-1"></i>Online</span>';
+        } else if (item.type === 'onsite') {
+          typeBadge = '<span class="text-xs text-slate-800 bg-slate-100 px-2.5 py-0.5 rounded-lg font-medium border border-slate-200"><i class="fa-solid fa-building-columns mr-1"></i>Onsite</span>';
+        } else {
+          typeBadge = '<span class="text-xs text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-lg font-medium border border-purple-200/70"><i class="fa-solid fa-rotate mr-1"></i>Hybrid</span>';
+        }
+
+        // Place Link on Google Maps
+        let placeDisplay = '';
+        if (item.place && item.place !== 'ออนไลน์ (Online)') {
+          const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.place)}`;
+          placeDisplay = `
+            <a href="${mapUrl}" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-slate-700 hover:text-rose-700 bg-slate-50 hover:bg-rose-50 px-2.5 py-1 rounded-lg border border-slate-200 hover:border-rose-200 transition" title="ดูตำแหน่งบน Google Maps">
+              <i class="fa-solid fa-location-dot text-rose-600"></i>
+              <span class="font-medium">${item.place}</span>
+              <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-400"></i>
+            </a>`;
+        } else {
+          placeDisplay = `
+            <span class="inline-flex items-center gap-1.5 text-xs text-slate-500 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">
+              <i class="fa-solid fa-laptop text-blue-500"></i> ออนไลน์ (Online)
+            </span>`;
+        }
+
+        // Action Buttons Setup (Exact Order: 1. Registration, 2. Name, 3. Materials, 4. Certificate)
+        // 1. Registration
+        const hasReg = (item.linkRegistration && item.linkRegistration.startsWith('http'));
+        const regBtn = hasReg
+          ? `<a href="${item.linkRegistration}" target="_blank" class="py-2 px-3 bg-blue-700 hover:bg-blue-800 text-white rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 shadow-xs">
+              <i class="fa-solid fa-user-plus text-[11px]"></i> สมัครอบรม
+            </a>`
+          : `<button disabled class="py-2 px-3 bg-slate-100 text-slate-400 rounded-xl font-medium text-xs cursor-not-allowed flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-user-plus text-[11px]"></i> สมัครอบรม
+            </button>`;
+
+        // 2. Names
+        const hasNames = (item.linkName && item.linkName.startsWith('http'));
+        const nameBtn = hasNames
+          ? `<a href="${item.linkName}" target="_blank" class="py-2 px-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 shadow-xs">
+              <i class="fa-solid fa-list-check text-[11px]"></i> ตรวจสอบรายชื่อ
+            </a>`
+          : `<button disabled class="py-2 px-3 bg-slate-100 text-slate-400 rounded-xl font-medium text-xs cursor-not-allowed flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-list-check text-[11px]"></i> ตรวจสอบรายชื่อ
+            </button>`;
+
+        // 3. Materials (Multi-URL Modal Support)
+        const matLinks = item.linkMaterials || [];
+        const hasMat = matLinks.length > 0;
+        let matBtn = '';
+        if (hasMat) {
+          matBtn = `<button onclick="openMaterialsPopup('${encodeURIComponent(JSON.stringify(item))}')" class="py-2 px-3 bg-purple-700 hover:bg-purple-800 text-white rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 shadow-xs">
+            <i class="fa-solid fa-file-lines text-[11px]"></i> เอกสารประกอบ ${matLinks.length > 1 ? `(${matLinks.length})` : ''}
+          </button>`;
+        } else {
+          matBtn = `<button disabled class="py-2 px-3 bg-slate-100 text-slate-400 rounded-xl font-medium text-xs cursor-not-allowed flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-file-lines text-[11px]"></i> เอกสารประกอบ
+          </button>`;
+        }
+
+        // 4. Certificate
+        const certUrl = (item.linkCertificated && item.linkCertificated.startsWith('http')) 
+          ? item.linkCertificated 
+          : 'https://script.google.com/macros/s/AKfycbwEKynG_L-2HeuEU3PzlTu8he1PzAK2AGS_b3RRlk-pFDy6WrwuwwTQVZArG8NI-fbS/exec';
+        const certBtn = `<a href="${certUrl}" target="_blank" class="py-2 px-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 shadow-xs">
+          <i class="fa-solid fa-award text-[11px]"></i> รับเกียรติบัตร
+        </a>`;
+
+        // Explicit Edit Course Button + Delete
+        let adminActionTools = '';
+        if (currentAdminPin) {
+          adminActionTools = `
+            <div class="flex items-center justify-between border-t border-slate-100 pt-2 text-xs">
+              <span class="text-[11px] text-slate-400">บันทึกเมื่อ: ${item.timestamp || '-'}</span>
+              <div class="flex items-center gap-1.5">
+                <button onclick="editCourseEntry('${encodeURIComponent(JSON.stringify(item))}')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 rounded-lg transition flex items-center gap-1 font-semibold">
+                  <i class="fa-solid fa-pen-to-square text-amber-600"></i> แก้ไขหลักสูตร
+                </button>
+                <button onclick="deleteCourseEntry('${encodeURIComponent(item.topic)}')" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg transition flex items-center gap-1 font-medium">
+                  <i class="fa-solid fa-trash text-rose-500"></i> ลบ
+                </button>
+              </div>
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <!-- Badges & Meta Top Row -->
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              ${statusBadge}
+              ${typeBadge}
+              <span class="text-xs bg-slate-100 text-slate-700 font-medium px-2.5 py-0.5 rounded-lg border border-slate-200/80">
+                🎯 ${item.target}
+              </span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-slate-500 flex items-center gap-1.5 font-medium">
+                <i class="fa-regular fa-calendar-days text-slate-400"></i> ${item.date}
+              </span>
+              <button onclick="promptEditCourse('${encodeURIComponent(JSON.stringify(item))}')" class="px-2 py-0.5 bg-slate-100 hover:bg-amber-50 text-slate-600 hover:text-amber-800 border border-slate-200/80 hover:border-amber-300 rounded-lg text-[11px] font-medium transition flex items-center gap-1" title="แก้ไขข้อมูลหลักสูตรนี้">
+                <i class="fa-solid fa-pen-to-square text-amber-600"></i> แก้ไข
+              </button>
+            </div>
+          </div>
+
+          <!-- Course Topic -->
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900 leading-snug tracking-tight">
+              ${item.topic}
+            </h3>
+            <div class="mt-1.5">${placeDisplay}</div>
+          </div>
+
+          <!-- 4 Action Buttons Grid in Exact Order: 1. Registration, 2. Names, 3. Materials, 4. Certificate -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 border-t border-slate-100">
+            ${regBtn}
+            ${nameBtn}
+            ${matBtn}
+            ${certBtn}
+          </div>
+
+          ${adminActionTools}
+        `;
+
+        listContainer.appendChild(card);
+      });
+    }
+
+    // 📚 Materials Multi-Link Popup Modal
+    function openMaterialsPopup(encodedJson) {
+      const course = JSON.parse(decodeURIComponent(encodedJson));
+      const links = course.linkMaterials || [];
+
+      if (links.length === 1) {
+        window.open(links[0], '_blank');
+        return;
+      }
+
+      let html = `
+        <div class="text-left space-y-2.5 pt-2">
+          <p class="text-xs text-slate-600 font-medium">หลักสูตร: <strong>${course.topic}</strong></p>
+          <div class="space-y-2">`;
+      
+      links.forEach((url, idx) => {
+        html += `
+          <a href="${url}" target="_blank" class="flex items-center justify-between p-3 bg-purple-50 hover:bg-purple-100/70 border border-purple-200 rounded-xl transition text-left text-xs text-purple-950 font-semibold group">
+            <span class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-lg bg-purple-200 text-purple-900 flex items-center justify-center font-bold text-[11px]">${idx + 1}</span>
+              <span class="truncate max-w-[280px]">${url}</span>
+            </span>
+            <i class="fa-solid fa-arrow-up-right-from-square text-purple-400 group-hover:text-purple-700"></i>
+          </a>`;
+      });
+
+      html += `</div></div>`;
+
+      Swal.fire({
+        title: 'เอกสารประกอบการบรรยาย',
+        html: html,
+        showConfirmButton: false,
+        showCloseButton: true
+      });
+    }
+
+    // 🛡️ Admin Verification & Modals
+    function openAdminModal() {
+      if (currentAdminPin) {
+        Swal.fire({
+          title: 'ออกจากระบบ?',
+          text: 'ต้องการออกจากโหมดผู้ดูแลระบบใช่หรือไม่',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'ออกจากระบบ',
+          cancelButtonText: 'ยกเลิก',
+          confirmButtonColor: '#0f172a'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            currentAdminPin = null;
+            document.getElementById('adminStatusBar').classList.add('hidden');
+            document.getElementById('adminBtnLabel').innerText = 'ผู้ดูแลระบบ';
+            filterCourses();
+          }
+        });
+        return;
+      }
+
+      Swal.fire({
+        title: 'ยืนยันสิทธิ์ผู้ดูแลระบบ',
+        input: 'password',
+        inputLabel: 'กรุณากรอกรหัสผ่าน (PIN) เพื่อจัดการข้อมูล',
+        inputPlaceholder: 'ใส่รหัส PIN 4 หลัก (ค่าเริ่มต้น: 1234)',
+        showCancelButton: true,
+        confirmButtonText: 'เข้าสู่ระบบ',
+        cancelButtonText: 'ยกเลิก',
+        confirmButtonColor: '#0f172a',
+        showLoaderOnConfirm: true,
+        preConfirm: (pin) => {
+          if (isGasEnvironment()) {
+            return new Promise((resolve) => {
+              google.script.run.withSuccessHandler((res) => {
+                if (res.success) {
+                  currentAdminPin = pin;
+                  resolve(true);
+                } else {
+                  Swal.showValidationMessage('รหัสผ่านไม่ถูกต้อง');
+                  resolve(false);
+                }
+              }).verifyAdminPin(pin);
+            });
+          } else {
+            if (pin.trim() === '1234') {
+              currentAdminPin = pin;
+              return true;
+            } else {
+              Swal.showValidationMessage('รหัสผ่านไม่ถูกต้อง');
+              return false;
+            }
+          }
+        }
+      }).then((result) => {
+        if (result.isConfirmed && currentAdminPin) {
+          document.getElementById('adminStatusBar').classList.remove('hidden');
+          document.getElementById('adminBtnLabel').innerText = 'ออกจากระบบ';
+          filterCourses();
+          Swal.fire({
+            icon: 'success',
+            title: 'ยินดีต้อนรับ ศน.รัชภูมิ',
+            text: 'เข้าสู่โหมดจัดการข้อมูลเรียบร้อยแล้ว',
+            timer: 1500,
+            showConfirmButton: false
+          });
+        }
+      });
+    }
+
+    // Open Horizontal Form for New Course
+    function openNewCourseForm() {
+      document.getElementById('courseForm').reset();
+      document.getElementById('formRowId').value = '';
+      document.getElementById('formOriginalTopic').value = '';
+      document.getElementById('modalFormTitle').innerText = 'บันทึกข้อมูลหลักสูตรการอบรมใหม่ (Training Course)';
+      
+      const todayIso = new Date().toISOString().split('T')[0];
+      document.getElementById('formDatePicker').value = todayIso;
+      document.getElementById('formStartTime24').value = '13:00';
+      document.getElementById('formEndTime24').value = '16:00';
+      document.getElementById('formType').value = 'online';
+      document.getElementById('formStatus').value = 'เปิดการอบรม';
+      document.getElementById('formPlace').value = 'ออนไลน์ (Online)';
+      document.getElementById('formLinkCertificated').value = 'https://script.google.com/macros/s/AKfycbwEKynG_L-2HeuEU3PzlTu8he1PzAK2AGS_b3RRlk-pFDy6WrwuwwTQVZArG8NI-fbS/exec';
+      
+      updateDatePreview();
+      updateGoogleMapEmbed('ออนไลน์ (Online)');
+
+      document.getElementById('courseModal').classList.remove('hidden');
+    }
+
+    // Prompt Edit Course with PIN if not yet logged in
+    function promptEditCourse(encodedJson) {
+      if (currentAdminPin) {
+        editCourseEntry(encodedJson);
+      } else {
+        Swal.fire({
+          title: 'ยืนยันสิทธิ์ผู้ดูแลระบบ',
+          input: 'password',
+          inputLabel: 'กรุณากรอกรหัสผ่าน (PIN) เพื่อแก้ไขหลักสูตรนี้',
+          inputPlaceholder: 'ใส่รหัส PIN 4 หลัก (ค่าเริ่มต้น: 1234)',
+          showCancelButton: true,
+          confirmButtonText: 'เข้าสู่ระบบและแก้ไข',
+          cancelButtonText: 'ยกเลิก',
+          confirmButtonColor: '#0f172a'
+        }).then((res) => {
+          if (res.isConfirmed && res.value) {
+            const pin = res.value.trim();
+            if (isGasEnvironment()) {
+              google.script.run.withSuccessHandler((vRes) => {
+                if (vRes.success) {
+                  currentAdminPin = pin;
+                  document.getElementById('adminStatusBar').classList.remove('hidden');
+                  document.getElementById('adminBtnLabel').innerText = 'ออกจากระบบ';
+                  filterCourses();
+                  editCourseEntry(encodedJson);
+                } else {
+                  Swal.fire({ icon: 'error', title: 'รหัสผ่านไม่ถูกต้อง' });
+                }
+              }).verifyAdminPin(pin);
+            } else {
+              if (pin === '1234') {
+                currentAdminPin = pin;
+                document.getElementById('adminStatusBar').classList.remove('hidden');
+                document.getElementById('adminBtnLabel').innerText = 'ออกจากระบบ';
+                filterCourses();
+                editCourseEntry(encodedJson);
+              } else {
+                Swal.fire({ icon: 'error', title: 'รหัสผ่านไม่ถูกต้อง' });
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // Selector Modal for editing any course from Admin Bar
+    function openEditCourseSelector() {
+      if (allCoursesData.length === 0) {
+        Swal.fire({ icon: 'info', title: 'ยังไม่มีหลักสูตรในระบบ', text: 'กรุณาบันทึกหลักสูตรใหม่ก่อน' });
+        return;
+      }
+      const inputOptions = {};
+      allCoursesData.forEach((c, idx) => {
+        inputOptions[idx] = `${idx + 1}. ${c.topic} (${c.date})`;
+      });
+
+      Swal.fire({
+        title: 'เลือกหลักสูตรที่ต้องการแก้ไข',
+        input: 'select',
+        inputOptions: inputOptions,
+        inputPlaceholder: '-- เลือกหลักสูตรที่ต้องการแก้ไข --',
+        showCancelButton: true,
+        confirmButtonText: 'เปิดแบบฟอร์มแก้ไข',
+        cancelButtonText: 'ยกเลิก',
+        confirmButtonColor: '#0f172a'
+      }).then((result) => {
+        if (result.isConfirmed && result.value !== undefined && result.value !== '') {
+          const selectedCourse = allCoursesData[parseInt(result.value, 10)];
+          if (selectedCourse) {
+            editCourseEntry(encodeURIComponent(JSON.stringify(selectedCourse)));
+          }
+        }
+      });
+    }
+
+    // Open Horizontal Form for Editing
+    function editCourseEntry(encodedJson) {
+      const course = JSON.parse(decodeURIComponent(encodedJson));
+      document.getElementById('courseForm').reset();
+      document.getElementById('formRowId').value = course.rowId || '';
+      document.getElementById('formOriginalTopic').value = course.topic || '';
+      document.getElementById('modalFormTitle').innerText = `แก้ไขข้อมูลหลักสูตร: ${course.topic}`;
+
+      document.getElementById('formTopic').value = course.topic || '';
+      document.getElementById('formTarget').value = course.target || '';
+      document.getElementById('formType').value = course.type || 'online';
+      document.getElementById('formStatus').value = course.status || 'เปิดการอบรม';
+      document.getElementById('formPlace').value = course.place || 'ออนไลน์ (Online)';
+      
+      document.getElementById('formLinkRegistration').value = course.linkRegistration || '';
+      document.getElementById('formLinkName').value = course.linkName || '';
+      document.getElementById('formLinkCertificated').value = course.linkCertificated || 'https://script.google.com/macros/s/AKfycbwEKynG_L-2HeuEU3PzlTu8he1PzAK2AGS_b3RRlk-pFDy6WrwuwwTQVZArG8NI-fbS/exec';
+
+      const links = course.linkMaterials || [];
+      document.getElementById('formLinkMaterial1').value = links[0] || '';
+      document.getElementById('formLinkMaterial2').value = links[1] || '';
+      document.getElementById('formLinkMaterial3').value = links[2] || '';
+
+      const todayIso = new Date().toISOString().split('T')[0];
+      document.getElementById('formDatePicker').value = todayIso;
+      updateDatePreview();
+      updateGoogleMapEmbed(course.place || 'ออนไลน์ (Online)');
+
+      document.getElementById('courseModal').classList.remove('hidden');
+    }
+
+    function closeCourseModal() {
+      document.getElementById('courseModal').classList.add('hidden');
+    }
+
+    // 💾 Form Submission
+    function handleFormSubmit(e) {
+      e.preventDefault();
+
+      const saveBtn = document.getElementById('saveCourseSubmitBtn');
+      const rawDate = document.getElementById('formDatePicker').value;
+      const formattedDate = formatThaiDateString(rawDate);
+      
+      const startTime24 = document.getElementById('formStartTime24').value.replace(':', '.');
+      const endTime24 = document.getElementById('formEndTime24').value.replace(':', '.');
+      const fullDateSchedule = `${formattedDate} เวลา ${startTime24} - ${endTime24} น.`;
+
+      const typeVal = document.getElementById('formType').value;
+      let finalPlace = document.getElementById('formPlace').value.trim();
+      if (!finalPlace) {
+        finalPlace = (typeVal === 'online') ? 'ออนไลน์ (Online)' : 'สำนักงานศึกษาธิการจังหวัดเชียงใหม่';
+      }
+
+      const finalPin = currentAdminPin || '1234';
+
+      const payload = {
+        action: 'saveEntry',
+        adminPin: finalPin,
+        pin: finalPin,
+        rowId: document.getElementById('formRowId').value,
+        originalTopic: document.getElementById('formOriginalTopic').value,
+        topic: document.getElementById('formTopic').value,
+        target: document.getElementById('formTarget').value,
+        date: fullDateSchedule,
+        type: typeVal,
+        place: finalPlace,
+        status: document.getElementById('formStatus').value,
+        linkRegistration: document.getElementById('formLinkRegistration').value.trim(),
+        linkName: document.getElementById('formLinkName').value.trim(),
+        linkCertificated: document.getElementById('formLinkCertificated').value.trim(),
+        linkMaterial1: document.getElementById('formLinkMaterial1').value.trim(),
+        linkMaterial2: document.getElementById('formLinkMaterial2').value.trim(),
+        linkMaterial3: document.getElementById('formLinkMaterial3').value.trim()
+      };
+
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังบันทึก...';
+
+      if (isGasEnvironment()) {
+        google.script.run
+          .withSuccessHandler((res) => {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> บันทึกลง Google Sheet';
+            if (res.success) {
+              closeCourseModal();
+              Swal.fire({ icon: 'success', title: 'สำเร็จ', text: res.message, confirmButtonColor: '#0f172a' });
+              fetchData();
+            } else {
+              Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: res.message });
+            }
+          })
+          .withFailureHandler((err) => {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> บันทึกลง Google Sheet';
+            Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: err.message });
+          })
+          .saveAdminEntry(payload);
+      } else {
+        const postData = JSON.stringify(payload);
+        fetch(gasApiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: postData
+        })
+        .then(() => {
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> บันทึกลง Google Sheet';
+          closeCourseModal();
+          Swal.fire({ 
+            icon: 'success', 
+            title: 'บันทึกข้อมูลเรียบร้อยแล้ว', 
+            text: 'ระบบได้ส่งข้อมูลไปยัง Google Sheet ใน tab Training Course เรียบร้อยแล้ว', 
+            confirmButtonColor: '#0f172a' 
+          });
+          setTimeout(fetchData, 1500);
+        })
+        .catch(err => {
+          const params = new URLSearchParams(payload).toString();
+          const getUrl = gasApiUrl.includes('?') ? `${gasApiUrl}&${params}` : `${gasApiUrl}?${params}`;
+          fetch(getUrl, { mode: 'no-cors' }).then(() => {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> บันทึกลง Google Sheet';
+            closeCourseModal();
+            Swal.fire({ icon: 'success', title: 'บันทึกข้อมูลเรียบร้อยแล้ว', confirmButtonColor: '#0f172a' });
+            setTimeout(fetchData, 1500);
+          }).catch(finalErr => {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> บันทึกลง Google Sheet';
+            Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: finalErr.toString() });
+          });
+        });
+      }
+    }
+
+    // 🗑️ Delete Course
+    function deleteCourseEntry(encodedTopic) {
+      const topic = decodeURIComponent(encodedTopic);
+      Swal.fire({
+        title: 'ยืนยันการลบ?',
+        text: `ต้องการลบหลักสูตร "${topic}" ออกจากระบบใช่หรือไม่`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'ลบข้อมูล',
+        cancelButtonText: 'ยกเลิก',
+        confirmButtonColor: '#e11d48'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const finalPin = currentAdminPin || '1234';
+          const payload = { action: 'deleteEntry', adminPin: finalPin, pin: finalPin, topic: topic };
+          if (isGasEnvironment()) {
+            google.script.run
+              .withSuccessHandler((res) => {
+                if (res.success) {
+                  Swal.fire({ icon: 'success', title: 'ลบสำเร็จ', text: res.message, timer: 1200, showConfirmButton: false });
+                  fetchData();
+                } else {
+                  Swal.fire({ icon: 'error', title: 'ลบล้มเหลว', text: res.message });
+                }
+              })
+              .deleteAdminEntry(payload);
+          } else {
+            fetch(gasApiUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify(payload)
+            }).then(() => {
+              Swal.fire({ icon: 'success', title: 'ลบสำเร็จ', text: 'ส่งคำสั่งลบไปยัง Google Sheet เรียบร้อยแล้ว', timer: 1200, showConfirmButton: false });
+              setTimeout(fetchData, 1500);
+            });
+          }
+        }
+      });
+    }
+
+    // ⚙️ API Config Modal
+    function openApiConfigModal() {
+      Swal.fire({
+        title: 'ตั้งค่า Google Apps Script Web App URL',
+        input: 'url',
+        inputLabel: 'สำหรับเชื่อมต่อข้อมูลเมื่อนำขึ้น Vercel / GitHub Pages',
+        inputValue: gasApiUrl,
+        inputPlaceholder: 'https://script.google.com/macros/s/.../exec',
+        showCancelButton: true,
+        confirmButtonText: 'บันทึกการเชื่อมต่อ',
+        cancelButtonText: 'ยกเลิก',
+        confirmButtonColor: '#0f172a'
+      }).then((result) => {
+        if (result.isConfirmed && result.value) {
+          gasApiUrl = result.value.trim();
+          localStorage.setItem('TRAINING_GAS_API_URL', gasApiUrl);
+          Swal.fire({ icon: 'success', title: 'บันทึก URL สำเร็จ', timer: 1200, showConfirmButton: false });
+          fetchData();
+        }
+      });
+    }
+
+    // 🔠 Font Scale
+    function setFontScale(level) {
+      const root = document.documentElement;
+      document.querySelectorAll('#btn-font-sm, #btn-font-md, #btn-font-lg').forEach(btn => {
+        btn.classList.remove('bg-white/20', 'font-bold', 'text-white');
+        btn.classList.add('text-white/70');
+      });
+      if (level === 'small') {
+        root.style.setProperty('--font-scale', '0.96');
+        document.getElementById('btn-font-sm').classList.add('bg-white/20', 'font-bold', 'text-white');
+      } else if (level === 'large') {
+        root.style.setProperty('--font-scale', '1.18');
+        document.getElementById('btn-font-lg').classList.add('bg-white/20', 'font-bold', 'text-white');
+      } else {
+        root.style.setProperty('--font-scale', '1.05');
+        document.getElementById('btn-font-md').classList.add('bg-white/20', 'font-bold', 'text-white');
+      }
+    }
+
+    // 🎨 Academic Themes
+    function setAppTheme(theme) {
+      document.body.classList.remove('theme-academic', 'theme-forest', 'theme-warm');
+      document.querySelectorAll('#btn-thm-academic, #btn-thm-forest, #btn-thm-warm').forEach(btn => {
+        btn.classList.remove('bg-white/20', 'font-medium', 'text-white');
+        btn.classList.add('text-white/70');
+      });
+      if (theme === 'forest') {
+        document.body.classList.add('theme-forest');
+        document.getElementById('btn-thm-forest').classList.add('bg-white/20', 'font-medium', 'text-white');
+      } else if (theme === 'warm') {
+        document.body.classList.add('theme-warm');
+        document.getElementById('btn-thm-warm').classList.add('bg-white/20', 'font-medium', 'text-white');
+      } else {
+        document.body.classList.add('theme-academic');
+        document.getElementById('btn-thm-academic').classList.add('bg-white/20', 'font-medium', 'text-white');
+      }
+    }
+
+    // 🌟 On DOM Load
+    window.addEventListener('DOMContentLoaded', () => {
+      initTime24Dropdowns();
+      fetchData();
+    });
+  </script>
+</body>
+</html>

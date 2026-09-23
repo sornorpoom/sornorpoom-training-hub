@@ -1,0 +1,304 @@
+/**
+ * ระบบบริหารการจัดอบรม (Training Workflow Portal Hub)
+ * สำนักงานศึกษาธิการจังหวัดเชียงใหม่
+ * ออกแบบและพัฒนาโดย ศน.รัชภูมิ สมสมัย
+ * Google Sheet ID: 14ZTGU9GJXXE0Kld8DSeeMG8wCQxooDgyIB2qKhKol-I
+ * Tab: Training Course
+ */
+
+const SPREADSHEET_ID = '14ZTGU9GJXXE0Kld8DSeeMG8wCQxooDgyIB2qKhKol-I';
+const ADMIN_PIN = '1234'; 
+const SHEET_NAME = 'Training Course';
+const DEFAULT_CERT_URL = 'https://script.google.com/macros/s/AKfycbwEKynG_L-2HeuEU3PzlTu8he1PzAK2AGS_b3RRlk-pFDy6WrwuwwTQVZArG8NI-fbS/exec';
+
+const HEADERS = [
+  'Timestamp',
+  'Topic',
+  'Target',
+  'Date',
+  'Type',
+  'Place',
+  'Status',
+  'Link materials',
+  'Link registration',
+  'Link name',
+  'Link certificated'
+];
+
+/**
+ * ฟังก์ชันค้นหาหรือสร้างแท็บ Training Course แบบ Safe Guard
+ */
+function getCourseSheet(ss) {
+  let sheet = ss.getSheetByName(SHEET_NAME);
+  if (sheet) return sheet;
+
+  // ค้นหาแบบไม่คำนึงถึงตัวพิมพ์เล็กใหญ่ หรือช่องว่างหัวท้าย
+  const sheets = ss.getSheets();
+  for (let i = 0; i < sheets.length; i++) {
+    const sName = sheets[i].getName().trim().toLowerCase();
+    if (sName === 'training course' || sName.includes('training') || sName.includes('course')) {
+      return sheets[i];
+    }
+  }
+
+  // หากไม่มีให้สร้างใหม่พร้อมกำหนดหัวตาราง
+  sheet = ss.insertSheet(SHEET_NAME);
+  sheet.appendRow(HEADERS);
+  sheet.getRange(1, 1, 1, HEADERS.length)
+       .setFontWeight('bold')
+       .setBackground('#0f172a')
+       .setFontColor('#ffffff');
+  sheet.setFrozenRows(1);
+  return sheet;
+}
+
+/**
+ * รองรับทั้งการแสดงผล Web App และ API แบบ GET
+ */
+function doGet(e) {
+  if (e && e.parameter && e.parameter.action) {
+    const action = e.parameter.action;
+    let result = { success: false, message: 'Invalid action' };
+
+    if (action === 'getData') {
+      result = getTrainingPortalData();
+    } else if (action === 'verifyPin') {
+      result = verifyAdminPin(e.parameter.pin || '');
+    } else if (action === 'saveEntry') {
+      result = saveAdminEntry(e.parameter);
+    } else if (action === 'deleteEntry') {
+      result = deleteAdminEntry(e.parameter);
+    }
+
+    return ContentService
+      .createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  return HtmlService.createTemplateFromFile('Index')
+    .evaluate()
+    .setTitle('ระบบบริหารการจัดอบรม - ศธจ.เชียงใหม่')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1.0')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+/**
+ * รองรับการบันทึกข้อมูลผ่าน POST API สำหรับ Vercel / GitHub Pages
+ */
+function doPost(e) {
+  try {
+    let payload = {};
+    if (e.postData && e.postData.contents) {
+      try {
+        payload = JSON.parse(e.postData.contents);
+      } catch (jsonErr) {
+        payload = e.parameter || {};
+      }
+    } else if (e.parameter) {
+      payload = e.parameter;
+    }
+
+    const action = payload.action || 'saveEntry';
+    let result = { success: false, message: 'Unknown action' };
+
+    if (action === 'saveEntry') {
+      result = saveAdminEntry(payload);
+    } else if (action === 'deleteEntry') {
+      result = deleteAdminEntry(payload);
+    } else if (action === 'verifyPin') {
+      result = verifyAdminPin(payload.pin || payload.adminPin || '');
+    }
+
+    return ContentService
+      .createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: false, message: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+/**
+ * ดึงข้อมูลหลักสูตรทั้งหมดจากแท็บ Training Course
+ */
+function getTrainingPortalData() {
+  try {
+    let ss;
+    try {
+      ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    } catch (e) {
+      ss = SpreadsheetApp.getActiveSpreadsheet();
+    }
+    if (!ss) throw new Error("ไม่สามารถเปิด Google Sheet ID: " + SPREADSHEET_ID);
+
+    const sheet = getCourseSheet(ss);
+    const courses = [];
+
+    if (sheet.getLastRow() > 1) {
+      const data = sheet.getDataRange().getDisplayValues();
+      for (let i = 1; i < data.length; i++) {
+        const row = data[i];
+        if (!row || !row[1] || String(row[1]).trim() === '' || String(row[1]).trim() === 'Topic') continue;
+
+        const rawMaterials = row[7] || '';
+        const materialLinks = rawMaterials
+          .split(/[\n,]+/)
+          .map(s => s.trim())
+          .filter(s => s.startsWith('http://') || s.startsWith('https://'));
+
+        courses.push({
+          rowId: i + 1,
+          timestamp: row[0] || '',
+          topic: String(row[1] || '').trim(),
+          target: String(row[2] || 'ครูและบุคลากรทางการศึกษา').trim(),
+          date: String(row[3] || '-').trim(),
+          type: (row[4] || 'online').toLowerCase().trim(),
+          place: String(row[5] || 'ออนไลน์ (Online)').trim(),
+          status: String(row[6] || 'เปิดการอบรม').trim(),
+          linkMaterials: materialLinks,
+          linkMaterialsRaw: rawMaterials,
+          linkRegistration: (row[8] || '').trim(),
+          linkName: (row[9] || '').trim(),
+          linkCertificated: (row[10] || '').trim() || DEFAULT_CERT_URL
+        });
+      }
+    }
+
+    return {
+      success: true,
+      courses: courses,
+      defaultCertUrl: DEFAULT_CERT_URL
+    };
+
+  } catch (err) {
+    return { success: false, message: err.toString(), courses: [] };
+  }
+}
+
+function verifyAdminPin(pin) {
+  return { success: ((pin || '').trim() === ADMIN_PIN) };
+}
+
+/**
+ * บันทึกข้อมูลหลักสูตรลงในแท็บ Training Course (เพิ่มใหม่ หรือ อัปเดตแถวเดิม)
+ */
+function saveAdminEntry(payload) {
+  try {
+    let ss;
+    try {
+      ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    } catch (e) {
+      ss = SpreadsheetApp.getActiveSpreadsheet();
+    }
+    if (!ss) throw new Error("ไม่สามารถเปิด Google Sheet ID: " + SPREADSHEET_ID);
+
+    const sheet = getCourseSheet(ss);
+
+    // ตรวจสอบแถวหัวตาราง
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(HEADERS);
+      sheet.getRange(1, 1, 1, HEADERS.length)
+           .setFontWeight('bold')
+           .setBackground('#0f172a')
+           .setFontColor('#ffffff');
+      sheet.setFrozenRows(1);
+    }
+
+    const timestamp = Utilities.formatDate(new Date(), "GMT+7", "dd/MM/yyyy HH:mm:ss");
+
+    const topic = (payload.topic || '').trim();
+    const target = (payload.target || '').trim();
+    const date = (payload.date || '').trim();
+    const type = (payload.type || 'online').trim();
+    const place = (payload.place || 'ออนไลน์ (Online)').trim();
+    const status = (payload.status || 'เปิดการอบรม').trim();
+
+    // รวม URL สำหรับ Link materials (3 ช่อง)
+    const matUrls = [];
+    if (payload.linkMaterial1 && payload.linkMaterial1.trim()) matUrls.push(payload.linkMaterial1.trim());
+    if (payload.linkMaterial2 && payload.linkMaterial2.trim()) matUrls.push(payload.linkMaterial2.trim());
+    if (payload.linkMaterial3 && payload.linkMaterial3.trim()) matUrls.push(payload.linkMaterial3.trim());
+    if (matUrls.length === 0 && payload.linkMaterials) {
+      matUrls.push(payload.linkMaterials.trim());
+    }
+    const linkMaterials = matUrls.join('\n');
+
+    const linkRegistration = (payload.linkRegistration || '').trim();
+    const linkName = (payload.linkName || '').trim();
+    const linkCertificated = (payload.linkCertificated || '').trim() || DEFAULT_CERT_URL;
+
+    const rowValues = [
+      timestamp,
+      topic,
+      target,
+      date,
+      type,
+      place,
+      status,
+      linkMaterials,
+      linkRegistration,
+      linkName,
+      linkCertificated
+    ];
+
+    // ตรวจสอบว่าเป็นการแก้ไขตาม rowId หรือ Topic เดิม
+    let targetRow = -1;
+    if (payload.rowId && parseInt(payload.rowId, 10) > 1) {
+      targetRow = parseInt(payload.rowId, 10);
+    } else if (payload.originalTopic) {
+      const data = sheet.getDataRange().getDisplayValues();
+      for (let i = 1; i < data.length; i++) {
+        if (data[i][1] && data[i][1].trim().toLowerCase() === payload.originalTopic.trim().toLowerCase()) {
+          targetRow = i + 1;
+          break;
+        }
+      }
+    }
+
+    if (targetRow > 1 && targetRow <= sheet.getLastRow()) {
+      sheet.getRange(targetRow, 1, 1, HEADERS.length).setValues([rowValues]);
+      SpreadsheetApp.flush();
+      return { success: true, message: `อัปเดตข้อมูลหลักสูตร "${topic}" ใน Google Sheet เรียบร้อยแล้ว` };
+    } else {
+      sheet.appendRow(rowValues);
+      SpreadsheetApp.flush();
+      return { success: true, message: `บันทึกหลักสูตรใหม่ "${topic}" ลง Google Sheet (tab Training Course) สำเร็จแล้ว` };
+    }
+
+  } catch (err) {
+    return { success: false, message: 'เกิดข้อผิดพลาดในการบันทึก: ' + err.toString() };
+  }
+}
+
+/**
+ * ลบหลักสูตร
+ */
+function deleteAdminEntry(payload) {
+  try {
+    let ss;
+    try {
+      ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    } catch (e) {
+      ss = SpreadsheetApp.getActiveSpreadsheet();
+    }
+    if (!ss) return { success: false, message: 'ไม่พบตารางข้อมูล' };
+
+    const sheet = getCourseSheet(ss);
+    const topic = (payload.topic || '').trim();
+    const data = sheet.getDataRange().getDisplayValues();
+
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][1] && data[i][1].trim().toLowerCase() === topic.toLowerCase()) {
+        sheet.deleteRow(i + 1);
+        SpreadsheetApp.flush();
+        return { success: true, message: `ลบหลักสูตร "${topic}" เรียบร้อยแล้ว` };
+      }
+    }
+
+    return { success: false, message: 'ไม่พบหลักสูตรที่ต้องการลบ' };
+  } catch (err) {
+    return { success: false, message: err.toString() };
+  }
+}
