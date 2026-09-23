@@ -23,7 +23,9 @@ const HEADERS = [
   'Link registration',
   'Link name',
   'Link certificated',
-  'Link recheck'
+  'Link recheck',
+  'Link padlet',
+  'Link summary'
 ];
 
 /**
@@ -163,7 +165,11 @@ function getTrainingPortalData() {
           linkRegistration: (row[8] || '').trim(),
           linkName: (row[9] || '').trim(),
           linkCertificated: (row[10] || '').trim(),
-          linkRecheck: (row[11] || '').trim()
+          linkRecheck: (row[11] || '').trim(),
+          linkPadlet: (row[12] || '').trim(),
+          linkSummary: (row[13] || '').trim(),
+          linkPadletSummary: (row[12] || '').trim(),
+          linkTranscriptSummary: (row[13] || '').trim()
         });
       }
     }
@@ -235,6 +241,8 @@ function saveAdminEntry(payload) {
     }
 
     const linkRecheck = (payload.linkRecheck || '').trim();
+    const linkPadlet = (payload.linkPadlet || payload.linkPadletSummary || '').trim();
+    const linkSummary = (payload.linkSummary || payload.linkTranscriptSummary || '').trim();
 
     const rowValues = [
       timestamp,
@@ -248,7 +256,9 @@ function saveAdminEntry(payload) {
       linkRegistration,
       linkName,
       linkCertificated,
-      linkRecheck
+      linkRecheck,
+      linkPadlet,
+      linkSummary
     ];
 
     // ตรวจสอบว่าเป็นการแก้ไขตาม rowId หรือ Topic เดิม

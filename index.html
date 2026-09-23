@@ -651,6 +651,70 @@
           </div>
         </div>
 
+        <!-- POST-TRAINING OUTCOMES & SUMMARIES (ผลการอบรม & การถอดบทเรียน) -->
+        <div class="space-y-2 bg-gradient-to-r from-rose-50/50 via-indigo-50/40 to-slate-50/60 p-4 rounded-2xl border border-indigo-100/80">
+          <div class="flex items-center justify-between pb-1 border-b border-indigo-100/60">
+            <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <i class="fa-solid fa-book-open-reader text-indigo-600"></i> ผลการอบรม & การถอดบทเรียน (Post-Training Outcomes)
+            </h4>
+            <span class="text-[10px] text-indigo-600 font-medium bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
+              บันทึกลง Column M & N
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            
+            <!-- Link Padlet Summary (Column M: Link padlet summary - Default: ปิด) -->
+            <div id="padletCardContainer" class="bg-white p-3 rounded-xl border border-slate-200 space-y-1.5 transition">
+              <div class="flex items-center justify-between gap-1">
+                <label class="block font-semibold text-xs text-rose-800 flex items-center gap-1 truncate">
+                  <i class="fa-solid fa-comments text-rose-600"></i> ลิงก์สรุปความคิดเห็น (Padlet / Google Docs)
+                </label>
+                <!-- Toggle Button (เปิด / ปิด) - Default ปิด -->
+                <div class="flex items-center bg-slate-100 p-0.5 rounded-lg text-[10px] font-semibold border border-slate-200 shrink-0">
+                  <button type="button" onclick="togglePadletOption(true)" id="btnPadletOn" class="px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition">
+                    เปิด
+                  </button>
+                  <button type="button" onclick="togglePadletOption(false)" id="btnPadletOff" class="px-2 py-0.5 rounded-md bg-rose-600 text-white font-semibold transition shadow-2xs">
+                    ปิด
+                  </button>
+                </div>
+              </div>
+              <div id="padletInputArea" class="space-y-1 hidden">
+                <input type="url" id="formLinkPadletSummary" placeholder="https://docs.google.com/document/d/..." class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50/50" title="ลิงก์สรุปความคิดเห็นของเพื่อนครูจาก Padlet (Google Docs)">
+              </div>
+              <div id="padletDisabledNotice" class="py-1 px-2 text-center bg-slate-50 rounded-lg border border-slate-200/60">
+                <span class="text-[11px] text-slate-400 font-medium">🚫 ยังไม่มีสรุปความคิดเห็น</span>
+              </div>
+            </div>
+
+            <!-- Link Transcript Summary (Column N: Link transcript summary - Default: ปิด) -->
+            <div id="transcriptCardContainer" class="bg-white p-3 rounded-xl border border-slate-200 space-y-1.5 transition">
+              <div class="flex items-center justify-between gap-1">
+                <label class="block font-semibold text-xs text-indigo-800 flex items-center gap-1 truncate" title="สำหรับการอบรมรูปแบบ Online หรือ Hybrid">
+                  <i class="fa-solid fa-microphone-lines text-indigo-600"></i> ลิงก์ถอดเทปสรุปภาพรวม (Google Docs)
+                </label>
+                <!-- Toggle Button (เปิด / ปิด) - Default ปิด -->
+                <div class="flex items-center bg-slate-100 p-0.5 rounded-lg text-[10px] font-semibold border border-slate-200 shrink-0">
+                  <button type="button" onclick="toggleTranscriptOption(true)" id="btnTranscriptOn" class="px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition">
+                    เปิด
+                  </button>
+                  <button type="button" onclick="toggleTranscriptOption(false)" id="btnTranscriptOff" class="px-2 py-0.5 rounded-md bg-rose-600 text-white font-semibold transition shadow-2xs">
+                    ปิด
+                  </button>
+                </div>
+              </div>
+              <div id="transcriptInputArea" class="space-y-1 hidden">
+                <input type="url" id="formLinkTranscriptSummary" placeholder="https://docs.google.com/document/d/..." class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 bg-slate-50/50" title="ลิงก์ถอดเทปสรุปภาพรวมการอบรมจากคลิปเสียง (Google Docs)">
+              </div>
+              <div id="transcriptDisabledNotice" class="py-1 px-2 text-center bg-slate-50 rounded-lg border border-slate-200/60">
+                <span class="text-[11px] text-slate-400 font-medium">🚫 ยังไม่มีการถอดเทปสรุป</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
         <!-- FORM ACTION BUTTONS -->
         <div class="pt-2 flex items-center justify-end gap-2.5 border-t border-slate-100">
           <button type="button" onclick="closeCourseModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium transition text-xs sm:text-sm">
@@ -674,12 +738,14 @@
     let sortAscending = false; // false = newest date first
     let mapDebounceTimer = null;
     
-    // Toggle States for 5 Resources (Default: Registration & Names = true, Others = false)
+    // Toggle States for Resources (Default: Registration & Names = true, Others = false)
     let isRegistrationEnabled = true;
     let isNameEnabled = true;
     let isMaterialEnabled = false;
     let isRecheckEnabled = false;
     let isCertificateEnabled = false;
+    let isPadletEnabled = false;
+    let isTranscriptEnabled = false;
 
     function toggleRegistrationOption(enable) {
       isRegistrationEnabled = enable;
@@ -773,6 +839,44 @@
         if (inputField && !inputField.value.trim()) {
           inputField.value = 'https://script.google.com/macros/s/AKfycbwEKynG_L-2HeuEU3PzlTu8he1PzAK2AGS_b3RRlk-pFDy6WrwuwwTQVZArG8NI-fbS/exec';
         }
+      } else {
+        if (btnOff) btnOff.className = 'px-2 py-0.5 rounded-md bg-rose-600 text-white font-semibold transition shadow-2xs';
+        if (btnOn) btnOn.className = 'px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition';
+        if (inputArea) inputArea.classList.add('hidden');
+        if (notice) notice.classList.remove('hidden');
+      }
+    }
+
+    function togglePadletOption(enable) {
+      isPadletEnabled = enable;
+      const btnOn = document.getElementById('btnPadletOn');
+      const btnOff = document.getElementById('btnPadletOff');
+      const inputArea = document.getElementById('padletInputArea');
+      const notice = document.getElementById('padletDisabledNotice');
+      if (enable) {
+        if (btnOn) btnOn.className = 'px-2 py-0.5 rounded-md bg-rose-600 text-white font-semibold transition shadow-2xs';
+        if (btnOff) btnOff.className = 'px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition';
+        if (inputArea) inputArea.classList.remove('hidden');
+        if (notice) notice.classList.add('hidden');
+      } else {
+        if (btnOff) btnOff.className = 'px-2 py-0.5 rounded-md bg-rose-600 text-white font-semibold transition shadow-2xs';
+        if (btnOn) btnOn.className = 'px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition';
+        if (inputArea) inputArea.classList.add('hidden');
+        if (notice) notice.classList.remove('hidden');
+      }
+    }
+
+    function toggleTranscriptOption(enable) {
+      isTranscriptEnabled = enable;
+      const btnOn = document.getElementById('btnTranscriptOn');
+      const btnOff = document.getElementById('btnTranscriptOff');
+      const inputArea = document.getElementById('transcriptInputArea');
+      const notice = document.getElementById('transcriptDisabledNotice');
+      if (enable) {
+        if (btnOn) btnOn.className = 'px-2 py-0.5 rounded-md bg-indigo-600 text-white font-semibold transition shadow-2xs';
+        if (btnOff) btnOff.className = 'px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition';
+        if (inputArea) inputArea.classList.remove('hidden');
+        if (notice) notice.classList.add('hidden');
       } else {
         if (btnOff) btnOff.className = 'px-2 py-0.5 rounded-md bg-rose-600 text-white font-semibold transition shadow-2xs';
         if (btnOn) btnOn.className = 'px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition';
@@ -1041,7 +1145,9 @@
             linkRegistration: String(row[8] || '').trim(),
             linkName: String(row[9] || '').trim(),
             linkCertificated: String(row[10] || '').trim(),
-            linkRecheck: String(row[11] || '').trim()
+            linkRecheck: String(row[11] || '').trim(),
+            linkPadletSummary: String(row[12] || '').trim(),
+            linkTranscriptSummary: String(row[13] || '').trim()
           });
         }
 
@@ -1314,6 +1420,44 @@
               <i class="fa-solid fa-award text-[11px]"></i> ไม่มีเกียรติบัตร
             </button>`;
 
+        // 📑 Post-Training Outcomes (ผลการอบรม & การถอดบทเรียน: Padlet & Audio Transcript)
+        const padletUrl = sanitizeUrl(item.linkPadletSummary);
+        const transcriptUrl = sanitizeUrl(item.linkTranscriptSummary);
+        const hasPadlet = !!padletUrl;
+        const hasTranscript = !!transcriptUrl;
+        let outcomeSection = '';
+
+        if (hasPadlet || hasTranscript) {
+          const padletBadge = hasPadlet
+            ? `<a href="${padletUrl}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 transition shadow-2xs group" title="เปิดดูสรุปความคิดเห็นของเพื่อนครูจาก Padlet">
+                <i class="fa-solid fa-comments text-rose-600"></i>
+                <span>สรุปความคิดเห็น (Padlet)</span>
+                <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-rose-400 group-hover:text-rose-700"></i>
+              </a>`
+            : '';
+
+          const transcriptBadge = hasTranscript
+            ? `<a href="${transcriptUrl}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 transition shadow-2xs group" title="เปิดดูการถอดเทปและสรุปภาพรวมการอบรม">
+                <i class="fa-solid fa-microphone-lines text-indigo-600"></i>
+                <span>ถอดเทปสรุปภาพรวม</span>
+                <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-indigo-400 group-hover:text-indigo-700"></i>
+              </a>`
+            : '';
+
+          outcomeSection = `
+            <div class="mt-2 pt-2.5 border-t border-dashed border-indigo-200/80 bg-gradient-to-r from-rose-50/40 via-indigo-50/30 to-slate-50/50 p-2.5 rounded-xl flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-1.5 text-xs font-bold text-slate-700">
+                <i class="fa-solid fa-book-open-reader text-indigo-600"></i>
+                <span>ผลการอบรม & ถอดบทเรียน:</span>
+              </div>
+              <div class="flex items-center gap-2 flex-wrap">
+                ${padletBadge}
+                ${transcriptBadge}
+              </div>
+            </div>
+          `;
+        }
+
         // Explicit Edit Course Button + Delete (For Admin)
         let adminActionTools = '';
         if (currentAdminPin) {
@@ -1365,6 +1509,8 @@
             ${recheckBtn}
             ${certBtn}
           </div>
+
+          ${outcomeSection}
 
           ${adminActionTools}
         `;
@@ -1501,13 +1647,17 @@
       document.getElementById('formLinkMaterial1').value = '';
       document.getElementById('formLinkMaterial2').value = '';
       document.getElementById('formLinkCertificated').value = '';
+      document.getElementById('formLinkPadletSummary').value = '';
+      document.getElementById('formLinkTranscriptSummary').value = '';
 
-      // Set Defaults: Registration & Names = เปิด, Materials & Recheck & Certificate = ปิด
+      // Set Defaults: Registration & Names = เปิด, Others = ปิด
       toggleRegistrationOption(true);
       toggleNameOption(true);
       toggleMaterialOption(false);
       toggleRecheckOption(false);
       toggleCertificateOption(false);
+      togglePadletOption(false);
+      toggleTranscriptOption(false);
       
       updateDatePreview();
       updateGoogleMapEmbed('ออนไลน์ (Online)');
@@ -1636,6 +1786,16 @@
         document.getElementById('formLinkCertificated').value = '';
       }
 
+      // 6. Link Padlet (Column M)
+      const padletVal = course.linkPadlet || course.linkPadletSummary || '';
+      document.getElementById('formLinkPadletSummary').value = padletVal;
+      togglePadletOption(!!(padletVal && (padletVal.startsWith('http://') || padletVal.startsWith('https://'))));
+
+      // 7. Link Summary (Column N)
+      const summaryVal = course.linkSummary || course.linkTranscriptSummary || '';
+      document.getElementById('formLinkTranscriptSummary').value = summaryVal;
+      toggleTranscriptOption(!!(summaryVal && (summaryVal.startsWith('http://') || summaryVal.startsWith('https://'))));
+
       // Parse and retain exact saved Date, Start Time & End Time
       const schedule = parseScheduleDetails(course.date || '');
       document.getElementById('formDatePicker').value = schedule.isoDate;
@@ -1678,6 +1838,8 @@
       const finalCertLink = isCertificateEnabled ? document.getElementById('formLinkCertificated').value.trim() : '';
       const finalMat1 = isMaterialEnabled ? document.getElementById('formLinkMaterial1').value.trim() : '';
       const finalMat2 = isMaterialEnabled ? document.getElementById('formLinkMaterial2').value.trim() : '';
+      const finalPadletLink = isPadletEnabled ? document.getElementById('formLinkPadletSummary').value.trim() : '';
+      const finalSummaryLink = isTranscriptEnabled ? document.getElementById('formLinkTranscriptSummary').value.trim() : '';
 
       const payload = {
         action: 'saveEntry',
@@ -1697,7 +1859,11 @@
         linkRecheck: finalRecheckLink,
         linkCertificated: finalCertLink,
         linkMaterial1: finalMat1,
-        linkMaterial2: finalMat2
+        linkMaterial2: finalMat2,
+        linkPadlet: finalPadletLink,
+        linkSummary: finalSummaryLink,
+        linkPadletSummary: finalPadletLink,
+        linkTranscriptSummary: finalSummaryLink
       };
 
       saveBtn.disabled = true;
