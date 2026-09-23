@@ -22,7 +22,8 @@ const HEADERS = [
   'Link materials',
   'Link registration',
   'Link name',
-  'Link certificated'
+  'Link certificated',
+  'Link recheck'
 ];
 
 /**
@@ -161,7 +162,8 @@ function getTrainingPortalData() {
           linkMaterialsRaw: rawMaterials,
           linkRegistration: (row[8] || '').trim(),
           linkName: (row[9] || '').trim(),
-          linkCertificated: (row[10] || '').trim()
+          linkCertificated: (row[10] || '').trim(),
+          linkRecheck: (row[11] || '').trim()
         });
       }
     }
@@ -215,11 +217,10 @@ function saveAdminEntry(payload) {
     const place = (payload.place || 'ออนไลน์ (Online)').trim();
     const status = (payload.status || 'เปิดการอบรม').trim();
 
-    // รวม URL สำหรับ Link materials (3 ช่อง)
+    // รวม URL สำหรับ Link materials (2 ช่อง)
     const matUrls = [];
     if (payload.linkMaterial1 && payload.linkMaterial1.trim()) matUrls.push(payload.linkMaterial1.trim());
     if (payload.linkMaterial2 && payload.linkMaterial2.trim()) matUrls.push(payload.linkMaterial2.trim());
-    if (payload.linkMaterial3 && payload.linkMaterial3.trim()) matUrls.push(payload.linkMaterial3.trim());
     if (matUrls.length === 0 && payload.linkMaterials) {
       matUrls.push(payload.linkMaterials.trim());
     }
@@ -233,6 +234,8 @@ function saveAdminEntry(payload) {
       linkCertificated = '';
     }
 
+    const linkRecheck = (payload.linkRecheck || '').trim();
+
     const rowValues = [
       timestamp,
       topic,
@@ -244,7 +247,8 @@ function saveAdminEntry(payload) {
       linkMaterials,
       linkRegistration,
       linkName,
-      linkCertificated
+      linkCertificated,
+      linkRecheck
     ];
 
     // ตรวจสอบว่าเป็นการแก้ไขตาม rowId หรือ Topic เดิม
