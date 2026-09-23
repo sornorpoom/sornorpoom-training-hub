@@ -97,8 +97,59 @@
     }
     .course-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 12px 24px -8px rgba(15, 23, 42, 0.07);
-      border-color: #cbd5e1;
+      box-shadow: 0 12px 24px -8px rgba(15, 23, 42, 0.09);
+    }
+
+    /* 🎨 Course Cards Background: Active (Rich/Vibrant) vs Completed (Soft/Pale) with Alternating Shades */
+    .course-card-open-0 {
+      background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%) !important;
+      border-color: #93c5fd !important;
+      border-left: 4px solid #2563eb !important;
+      box-shadow: 0 4px 14px -3px rgba(37, 99, 235, 0.12) !important;
+    }
+    .course-card-open-1 {
+      background: linear-gradient(135deg, #ffffff 0%, #eef2ff 100%) !important;
+      border-color: #a5b4fc !important;
+      border-left: 4px solid #4f46e5 !important;
+      box-shadow: 0 4px 14px -3px rgba(79, 70, 229, 0.12) !important;
+    }
+    .course-card-closed-0 {
+      background: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+      border-left: 4px solid #94a3b8 !important;
+      opacity: 0.90;
+    }
+    .course-card-closed-1 {
+      background: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
+      border-left: 4px solid #cbd5e1 !important;
+      opacity: 0.85;
+    }
+
+    body.theme-forest .course-card-open-0 {
+      background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%) !important;
+      border-color: #6ee7b7 !important;
+      border-left: 4px solid #059669 !important;
+      box-shadow: 0 4px 14px -3px rgba(5, 150, 105, 0.12) !important;
+    }
+    body.theme-forest .course-card-open-1 {
+      background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%) !important;
+      border-color: #86efac !important;
+      border-left: 4px solid #16a34a !important;
+      box-shadow: 0 4px 14px -3px rgba(22, 163, 74, 0.12) !important;
+    }
+
+    body.theme-warm .course-card-open-0 {
+      background: linear-gradient(135deg, #ffffff 0%, #fff7ed 100%) !important;
+      border-color: #fdba74 !important;
+      border-left: 4px solid #ea580c !important;
+      box-shadow: 0 4px 14px -3px rgba(234, 88, 12, 0.12) !important;
+    }
+    body.theme-warm .course-card-open-1 {
+      background: linear-gradient(135deg, #ffffff 0%, #fef3c7 100%) !important;
+      border-color: #fcd34d !important;
+      border-left: 4px solid #d97706 !important;
+      box-shadow: 0 4px 14px -3px rgba(217, 119, 6, 0.12) !important;
     }
 
     /* Custom Scrollbar for Form */
@@ -123,23 +174,31 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between py-3.5 sm:py-4 gap-4">
         
-        <!-- Left: Branding & Organization Info -->
-        <div class="flex items-center gap-3.5">
-          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0 shadow-inner backdrop-blur-sm">
-            <i class="fa-solid fa-graduation-cap text-xl sm:text-2xl text-amber-300"></i>
+        <!-- Left: Branding & Organization Info with Logo -->
+        <div class="flex items-center gap-3 sm:gap-4">
+          <div class="relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/95 p-1 border border-white/40 flex items-center justify-center shrink-0 shadow-md backdrop-blur-sm overflow-hidden">
+            <img 
+              src="https://lh3.googleusercontent.com/d/1N3LSW3ag-DW59ibDnz5LZivqvMxSbhlq" 
+              alt="Logo ศธจ.เชียงใหม่" 
+              class="w-full h-full object-contain rounded-xl"
+              onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=1N3LSW3ag-DW59ibDnz5LZivqvMxSbhlq&sz=w500';"
+            />
           </div>
           <div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
               <h1 class="text-base sm:text-lg font-bold tracking-tight text-white leading-tight">
                 ระบบบริหารการจัดอบรม
               </h1>
-              <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-slate-950 border border-amber-300/80 shadow-2xs">
                 Hub Portal
               </span>
             </div>
-            <p class="text-xs text-slate-300 font-light flex items-center gap-1.5 mt-0.5">
+            <p class="text-xs text-slate-200/90 font-light flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5">
               <span>กลุ่มงานนิเทศ ติดตาม และประเมินผลการจัดการศึกษา ศธจ.เชียงใหม่</span>
-              <span class="opacity-60 hidden md:inline">• นวัตกรรมโดย ศน.รัชภูมิ สมสมัย</span>
+              <span class="opacity-80 hidden md:inline">• นวัตกรรมโดย ศน.รัชภูมิ สมสมัย</span>
+            </p>
+            <p class="text-[11px] text-amber-200/90 font-medium md:hidden">
+              • นวัตกรรมโดย ศน.รัชภูมิ สมสมัย
             </p>
           </div>
         </div>
@@ -495,31 +554,31 @@
               </div>
             </div>
 
-            <!-- 4. Link Certificate with Open/Close Toggle -->
+            <!-- 4. Link Certificate with Open/Close Toggle (Default: Closed/Disabled) -->
             <div id="certCardContainer" class="bg-white p-3 rounded-xl border border-slate-200 space-y-1.5 transition">
               <div class="flex items-center justify-between gap-1">
                 <label class="block font-semibold text-xs text-emerald-800 flex items-center gap-1">
                   <i class="fa-solid fa-award"></i> ลิงก์รับเกียรติบัตร
                 </label>
                 
-                <!-- Toggle Button (เปิด / ปิด) -->
+                <!-- Toggle Button (เปิด / ปิด) - Default ปิด -->
                 <div class="flex items-center bg-slate-100 p-0.5 rounded-lg text-[10px] font-semibold border border-slate-200">
-                  <button type="button" onclick="toggleCertificateOption(true)" id="btnCertOn" class="px-2 py-0.5 rounded-md bg-emerald-600 text-white font-semibold transition shadow-2xs">
+                  <button type="button" onclick="toggleCertificateOption(true)" id="btnCertOn" class="px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition">
                     เปิด
                   </button>
-                  <button type="button" onclick="toggleCertificateOption(false)" id="btnCertOff" class="px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition">
+                  <button type="button" onclick="toggleCertificateOption(false)" id="btnCertOff" class="px-2 py-0.5 rounded-md bg-rose-600 text-white font-semibold transition shadow-2xs">
                     ปิด
                   </button>
                 </div>
               </div>
 
-              <!-- Input Area -->
-              <div id="certInputArea" class="space-y-1">
-                <input type="url" id="formLinkCertificated" value="https://script.google.com/macros/s/AKfycbwEKynG_L-2HeuEU3PzlTu8he1PzAK2AGS_b3RRlk-pFDy6WrwuwwTQVZArG8NI-fbS/exec" placeholder="https://script.google.com/..." class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-emerald-600 bg-slate-50/50 text-slate-700">
+              <!-- Input Area (Hidden by Default) -->
+              <div id="certInputArea" class="space-y-1 hidden">
+                <input type="url" id="formLinkCertificated" value="" placeholder="https://script.google.com/..." class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-emerald-600 bg-slate-50/50 text-slate-700">
               </div>
 
-              <!-- Notice when disabled -->
-              <div id="certDisabledNotice" class="hidden py-1 px-2 text-center bg-slate-50 rounded-lg border border-slate-200/60">
+              <!-- Notice when disabled (Shown by Default) -->
+              <div id="certDisabledNotice" class="py-1 px-2 text-center bg-slate-50 rounded-lg border border-slate-200/60">
                 <span class="text-[11px] text-slate-400 font-medium">🚫 ไม่มีเกียรติบัตรสำหรับหลักสูตรนี้</span>
               </div>
             </div>
@@ -549,7 +608,7 @@
     let allCoursesData = [];
     let sortAscending = false; // false = newest date first
     let mapDebounceTimer = null;
-    let isCertificateEnabled = true;
+    let isCertificateEnabled = false; // Default: closed/disabled
 
     function toggleCertificateOption(enable) {
       isCertificateEnabled = enable;
@@ -568,7 +627,7 @@
           inputField.value = 'https://script.google.com/macros/s/AKfycbwEKynG_L-2HeuEU3PzlTu8he1PzAK2AGS_b3RRlk-pFDy6WrwuwwTQVZArG8NI-fbS/exec';
         }
       } else {
-        if (btnOff) btnOff.className = 'px-2 py-0.5 rounded-md bg-slate-600 text-white font-semibold transition shadow-2xs';
+        if (btnOff) btnOff.className = 'px-2 py-0.5 rounded-md bg-rose-600 text-white font-semibold transition shadow-2xs';
         if (btnOn) btnOn.className = 'px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition';
         if (inputArea) inputArea.classList.add('hidden');
         if (notice) notice.classList.remove('hidden');
@@ -581,6 +640,22 @@
 
     function isGasEnvironment() {
       return (typeof google !== 'undefined' && google.script && google.script.run);
+    }
+
+    // Helper to set select dropdown or dynamically add option if not in 30-min intervals
+    function setSelectValueOrAdd(selectElem, val) {
+      if (!selectElem || !val) return;
+      let exists = false;
+      for (let i = 0; i < selectElem.options.length; i++) {
+        if (selectElem.options[i].value === val) {
+          exists = true;
+          break;
+        }
+      }
+      if (!exists) {
+        selectElem.add(new Option(val, val));
+      }
+      selectElem.value = val;
     }
 
     // 🕒 Init 24-Hour Time Dropdowns
@@ -617,6 +692,85 @@
       const month = THAI_MONTHS[parseInt(parts[1], 10) - 1] || '';
       const day = parseInt(parts[2], 10);
       return `${day} ${month} ${year}`;
+    }
+
+    // Robust parser to extract exact ISO date, start time, and end time from saved date string
+    function parseScheduleDetails(dateStr) {
+      let parsedIsoDate = '';
+      let parsedStartTime = '13:00';
+      let parsedEndTime = '16:00';
+
+      if (!dateStr || typeof dateStr !== 'string') {
+        const todayIso = new Date().toISOString().split('T')[0];
+        return { isoDate: todayIso, startTime: parsedStartTime, endTime: parsedEndTime };
+      }
+
+      const cleanStr = dateStr.trim();
+
+      // 1. Extract Times: e.g. "เวลา 13.00 - 16.00 น." or "13:00 - 16:00" or "08.30-16.30"
+      const timeMatch = cleanStr.match(/(\d{1,2})[.:](\d{2})\s*(?:-|ถึง|to)\s*(\d{1,2})[.:](\d{2})/i);
+      if (timeMatch) {
+        const sh = timeMatch[1].padStart(2, '0');
+        const sm = timeMatch[2];
+        const eh = timeMatch[3].padStart(2, '0');
+        const em = timeMatch[4];
+        parsedStartTime = `${sh}:${sm}`;
+        parsedEndTime = `${eh}:${em}`;
+      }
+
+      // 2. Extract Date:
+      // 2.1 Thai month format: e.g. "1 ตุลาคม 2569" or "23 กันยายน 2569"
+      let matchedThaiMonth = false;
+      for (let m = 0; m < THAI_MONTHS.length; m++) {
+        const monthName = THAI_MONTHS[m];
+        if (cleanStr.includes(monthName)) {
+          matchedThaiMonth = true;
+          const parts = cleanStr.split(monthName);
+          const dayMatch = parts[0].match(/(\d{1,2})\s*$/) || parts[0].match(/(\d{1,2})/);
+          const day = dayMatch ? parseInt(dayMatch[1], 10) : 1;
+          
+          const yearMatch = parts[1].match(/(\d{4})/);
+          let year = yearMatch ? parseInt(yearMatch[1], 10) : 2569;
+          if (year > 2400) {
+            year -= 543;
+          }
+          const yyyy = year.toString().padStart(4, '0');
+          const mm = (m + 1).toString().padStart(2, '0');
+          const dd = day.toString().padStart(2, '0');
+          parsedIsoDate = `${yyyy}-${mm}-${dd}`;
+          break;
+        }
+      }
+
+      // 2.2 Check ISO format YYYY-MM-DD
+      if (!matchedThaiMonth) {
+        const isoMatch = cleanStr.match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+        if (isoMatch) {
+          let y = parseInt(isoMatch[1], 10);
+          if (y > 2400) y -= 543;
+          const yyyy = y.toString().padStart(4, '0');
+          const mm = parseInt(isoMatch[2], 10).toString().padStart(2, '0');
+          const dd = parseInt(isoMatch[3], 10).toString().padStart(2, '0');
+          parsedIsoDate = `${yyyy}-${mm}-${dd}`;
+        } else {
+          // 2.3 Check DD/MM/YYYY or DD-MM-YYYY format
+          const dmyMatch = cleanStr.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+          if (dmyMatch) {
+            let y = parseInt(dmyMatch[3], 10);
+            if (y > 2400) y -= 543;
+            const yyyy = y.toString().padStart(4, '0');
+            const mm = parseInt(dmyMatch[2], 10).toString().padStart(2, '0');
+            const dd = parseInt(dmyMatch[1], 10).toString().padStart(2, '0');
+            parsedIsoDate = `${yyyy}-${mm}-${dd}`;
+          }
+        }
+      }
+
+      if (!parsedIsoDate) {
+        parsedIsoDate = new Date().toISOString().split('T')[0];
+      }
+
+      return { isoDate: parsedIsoDate, startTime: parsedStartTime, endTime: parsedEndTime };
     }
 
     function parseThaiDateToTimestamp(dateStr) {
@@ -902,11 +1056,17 @@
         return;
       }
 
-      courses.forEach((item) => {
+      courses.forEach((item, index) => {
         const card = document.createElement('div');
-        card.className = "card-academic course-card rounded-2xl p-4 sm:p-5 border shadow-xs space-y-3.5";
-
         const isOpen = (item.status === 'เปิดการอบรม' || item.status === 'open');
+        const isEven = (index % 2 === 0);
+
+        if (isOpen) {
+          card.className = `card-academic course-card rounded-2xl p-4 sm:p-5 border shadow-sm space-y-3.5 course-card-open-${isEven ? '0' : '1'}`;
+        } else {
+          card.className = `card-academic course-card rounded-2xl p-4 sm:p-5 border shadow-2xs space-y-3.5 course-card-closed-${isEven ? '0' : '1'}`;
+        }
+
         const statusBadge = isOpen 
           ? '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> เปิดการอบรม</span>'
           : '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> อบรมเสร็จแล้ว</span>';
@@ -982,7 +1142,7 @@
               <i class="fa-solid fa-award text-[11px]"></i> ไม่มีเกียรติบัตร
             </button>`;
 
-        // Explicit Edit Course Button + Delete
+        // Explicit Edit Course Button + Delete (For Admin)
         let adminActionTools = '';
         if (currentAdminPin) {
           adminActionTools = `
@@ -1006,17 +1166,14 @@
             <div class="flex items-center gap-2 flex-wrap">
               ${statusBadge}
               ${typeBadge}
-              <span class="text-xs bg-slate-100 text-slate-700 font-medium px-2.5 py-0.5 rounded-lg border border-slate-200/80">
+              <span class="text-xs bg-slate-100/90 text-slate-700 font-medium px-2.5 py-0.5 rounded-lg border border-slate-200/80">
                 🎯 ${item.target}
               </span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-xs text-slate-500 flex items-center gap-1.5 font-medium">
+              <span class="text-xs text-slate-600 flex items-center gap-1.5 font-medium">
                 <i class="fa-regular fa-calendar-days text-slate-400"></i> ${item.date}
               </span>
-              <button onclick="promptEditCourse('${encodeURIComponent(JSON.stringify(item))}')" class="px-2 py-0.5 bg-slate-100 hover:bg-amber-50 text-slate-600 hover:text-amber-800 border border-slate-200/80 hover:border-amber-300 rounded-lg text-[11px] font-medium transition flex items-center gap-1" title="แก้ไขข้อมูลหลักสูตรนี้">
-                <i class="fa-solid fa-pen-to-square text-amber-600"></i> แก้ไข
-              </button>
             </div>
           </div>
 
@@ -1164,8 +1321,8 @@
       document.getElementById('formType').value = 'online';
       document.getElementById('formStatus').value = 'เปิดการอบรม';
       document.getElementById('formPlace').value = 'ออนไลน์ (Online)';
-      document.getElementById('formLinkCertificated').value = 'https://script.google.com/macros/s/AKfycbwEKynG_L-2HeuEU3PzlTu8he1PzAK2AGS_b3RRlk-pFDy6WrwuwwTQVZArG8NI-fbS/exec';
-      toggleCertificateOption(true);
+      document.getElementById('formLinkCertificated').value = '';
+      toggleCertificateOption(false); // Default ปิด
       
       updateDatePreview();
       updateGoogleMapEmbed('ออนไลน์ (Online)');
@@ -1279,8 +1436,11 @@
       document.getElementById('formLinkMaterial2').value = links[1] || '';
       document.getElementById('formLinkMaterial3').value = links[2] || '';
 
-      const todayIso = new Date().toISOString().split('T')[0];
-      document.getElementById('formDatePicker').value = todayIso;
+      // Parse and retain exact saved Date, Start Time & End Time
+      const schedule = parseScheduleDetails(course.date || '');
+      document.getElementById('formDatePicker').value = schedule.isoDate;
+      setSelectValueOrAdd(document.getElementById('formStartTime24'), schedule.startTime);
+      setSelectValueOrAdd(document.getElementById('formEndTime24'), schedule.endTime);
       updateDatePreview();
       updateGoogleMapEmbed(course.place || 'ออนไลน์ (Online)');
 
