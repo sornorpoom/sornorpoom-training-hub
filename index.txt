@@ -1056,8 +1056,8 @@
       Swal.fire({
         title: 'ยืนยันสิทธิ์ผู้ดูแลระบบ',
         input: 'password',
-        inputLabel: 'กรุณากรอกรหัสผ่าน (PIN) เพื่อจัดการข้อมูล',
-        inputPlaceholder: 'ใส่รหัส PIN 4 หลัก (ค่าเริ่มต้น: 1234)',
+        inputLabel: 'กรุณากรอกรหัสผ่านเพื่อจัดการข้อมูล',
+        inputPlaceholder: 'ใส่รหัสผ่านผู้ดูแลระบบ',
         showCancelButton: true,
         confirmButtonText: 'เข้าสู่ระบบ',
         cancelButtonText: 'ยกเลิก',
@@ -1077,7 +1077,7 @@
               }).verifyAdminPin(pin);
             });
           } else {
-            if (pin.trim() === '1234') {
+            if (pin.trim() === '254782115') {
               currentAdminPin = pin;
               return true;
             } else {
@@ -1132,8 +1132,8 @@
         Swal.fire({
           title: 'ยืนยันสิทธิ์ผู้ดูแลระบบ',
           input: 'password',
-          inputLabel: 'กรุณากรอกรหัสผ่าน (PIN) เพื่อแก้ไขหลักสูตรนี้',
-          inputPlaceholder: 'ใส่รหัส PIN 4 หลัก (ค่าเริ่มต้น: 1234)',
+          inputLabel: 'กรุณากรอกรหัสผ่านเพื่อแก้ไขหลักสูตรนี้',
+          inputPlaceholder: 'ใส่รหัสผ่านผู้ดูแลระบบ',
           showCancelButton: true,
           confirmButtonText: 'เข้าสู่ระบบและแก้ไข',
           cancelButtonText: 'ยกเลิก',
@@ -1154,7 +1154,7 @@
                 }
               }).verifyAdminPin(pin);
             } else {
-              if (pin === '1234') {
+              if (pin === '254782115') {
                 currentAdminPin = pin;
                 document.getElementById('adminStatusBar').classList.remove('hidden');
                 document.getElementById('adminBtnLabel').innerText = 'ออกจากระบบ';
@@ -1252,7 +1252,7 @@
         finalPlace = (typeVal === 'online') ? 'ออนไลน์ (Online)' : 'สำนักงานศึกษาธิการจังหวัดเชียงใหม่';
       }
 
-      const finalPin = currentAdminPin || '1234';
+      const finalPin = currentAdminPin || '254782115';
 
       const payload = {
         action: 'saveEntry',
@@ -1346,7 +1346,7 @@
         confirmButtonColor: '#e11d48'
       }).then((result) => {
         if (result.isConfirmed) {
-          const finalPin = currentAdminPin || '1234';
+          const finalPin = currentAdminPin || '254782115';
           const payload = { action: 'deleteEntry', adminPin: finalPin, pin: finalPin, topic: topic };
           if (isGasEnvironment()) {
             google.script.run

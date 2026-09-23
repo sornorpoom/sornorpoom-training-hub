@@ -7,7 +7,7 @@
  */
 
 const SPREADSHEET_ID = '14ZTGU9GJXXE0Kld8DSeeMG8wCQxooDgyIB2qKhKol-I';
-const ADMIN_PIN = '1234'; 
+const ADMIN_PIN = '254782115'; 
 const SHEET_NAME = 'Training Course';
 const DEFAULT_CERT_URL = 'https://script.google.com/macros/s/AKfycbwEKynG_L-2HeuEU3PzlTu8he1PzAK2AGS_b3RRlk-pFDy6WrwuwwTQVZArG8NI-fbS/exec';
 
