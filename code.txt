@@ -161,7 +161,7 @@ function getTrainingPortalData() {
           linkMaterialsRaw: rawMaterials,
           linkRegistration: (row[8] || '').trim(),
           linkName: (row[9] || '').trim(),
-          linkCertificated: (row[10] || '').trim() || DEFAULT_CERT_URL
+          linkCertificated: (row[10] || '').trim()
         });
       }
     }
@@ -227,7 +227,11 @@ function saveAdminEntry(payload) {
 
     const linkRegistration = (payload.linkRegistration || '').trim();
     const linkName = (payload.linkName || '').trim();
-    const linkCertificated = (payload.linkCertificated || '').trim() || DEFAULT_CERT_URL;
+    
+    let linkCertificated = (payload.linkCertificated || '').trim();
+    if (payload.hasCertificate === false || payload.hasCertificate === 'false' || linkCertificated === '-' || linkCertificated === 'none') {
+      linkCertificated = '';
+    }
 
     const rowValues = [
       timestamp,

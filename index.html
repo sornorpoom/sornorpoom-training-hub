@@ -495,12 +495,33 @@
               </div>
             </div>
 
-            <!-- 4. Link Certificate -->
-            <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
-              <label class="block font-semibold text-xs text-emerald-800 flex items-center gap-1">
-                <i class="fa-solid fa-award"></i> ลิงก์รับเกียรติบัตร
-              </label>
-              <input type="url" id="formLinkCertificated" value="https://script.google.com/macros/s/AKfycbwEKynG_L-2HeuEU3PzlTu8he1PzAK2AGS_b3RRlk-pFDy6WrwuwwTQVZArG8NI-fbS/exec" class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-emerald-600 bg-slate-50/50 text-slate-700">
+            <!-- 4. Link Certificate with Open/Close Toggle -->
+            <div id="certCardContainer" class="bg-white p-3 rounded-xl border border-slate-200 space-y-1.5 transition">
+              <div class="flex items-center justify-between gap-1">
+                <label class="block font-semibold text-xs text-emerald-800 flex items-center gap-1">
+                  <i class="fa-solid fa-award"></i> ลิงก์รับเกียรติบัตร
+                </label>
+                
+                <!-- Toggle Button (เปิด / ปิด) -->
+                <div class="flex items-center bg-slate-100 p-0.5 rounded-lg text-[10px] font-semibold border border-slate-200">
+                  <button type="button" onclick="toggleCertificateOption(true)" id="btnCertOn" class="px-2 py-0.5 rounded-md bg-emerald-600 text-white font-semibold transition shadow-2xs">
+                    เปิด
+                  </button>
+                  <button type="button" onclick="toggleCertificateOption(false)" id="btnCertOff" class="px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition">
+                    ปิด
+                  </button>
+                </div>
+              </div>
+
+              <!-- Input Area -->
+              <div id="certInputArea" class="space-y-1">
+                <input type="url" id="formLinkCertificated" value="https://script.google.com/macros/s/AKfycbwEKynG_L-2HeuEU3PzlTu8he1PzAK2AGS_b3RRlk-pFDy6WrwuwwTQVZArG8NI-fbS/exec" placeholder="https://script.google.com/..." class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-emerald-600 bg-slate-50/50 text-slate-700">
+              </div>
+
+              <!-- Notice when disabled -->
+              <div id="certDisabledNotice" class="hidden py-1 px-2 text-center bg-slate-50 rounded-lg border border-slate-200/60">
+                <span class="text-[11px] text-slate-400 font-medium">🚫 ไม่มีเกียรติบัตรสำหรับหลักสูตรนี้</span>
+              </div>
             </div>
 
           </div>
@@ -528,6 +549,31 @@
     let allCoursesData = [];
     let sortAscending = false; // false = newest date first
     let mapDebounceTimer = null;
+    let isCertificateEnabled = true;
+
+    function toggleCertificateOption(enable) {
+      isCertificateEnabled = enable;
+      const btnOn = document.getElementById('btnCertOn');
+      const btnOff = document.getElementById('btnCertOff');
+      const inputArea = document.getElementById('certInputArea');
+      const notice = document.getElementById('certDisabledNotice');
+      const inputField = document.getElementById('formLinkCertificated');
+
+      if (enable) {
+        if (btnOn) btnOn.className = 'px-2 py-0.5 rounded-md bg-emerald-600 text-white font-semibold transition shadow-2xs';
+        if (btnOff) btnOff.className = 'px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition';
+        if (inputArea) inputArea.classList.remove('hidden');
+        if (notice) notice.classList.add('hidden');
+        if (inputField && !inputField.value.trim()) {
+          inputField.value = 'https://script.google.com/macros/s/AKfycbwEKynG_L-2HeuEU3PzlTu8he1PzAK2AGS_b3RRlk-pFDy6WrwuwwTQVZArG8NI-fbS/exec';
+        }
+      } else {
+        if (btnOff) btnOff.className = 'px-2 py-0.5 rounded-md bg-slate-600 text-white font-semibold transition shadow-2xs';
+        if (btnOn) btnOn.className = 'px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition';
+        if (inputArea) inputArea.classList.add('hidden');
+        if (notice) notice.classList.remove('hidden');
+      }
+    }
 
     const SPREADSHEET_ID = '14ZTGU9GJXXE0Kld8DSeeMG8wCQxooDgyIB2qKhKol-I';
     const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbwmirtLgrcLXwddAtvOjHaUivrmWz_y9xofAt18972A65REyfBZBvN7AKJ7cuouTRIH/exec';
@@ -693,7 +739,7 @@
             linkMaterialsRaw: rawMaterials,
             linkRegistration: String(row[8] || '').trim(),
             linkName: String(row[9] || '').trim(),
-            linkCertificated: String(row[10] || '').trim() || 'https://script.google.com/macros/s/AKfycbwEKynG_L-2HeuEU3PzlTu8he1PzAK2AGS_b3RRlk-pFDy6WrwuwwTQVZArG8NI-fbS/exec'
+            linkCertificated: String(row[10] || '').trim()
           });
         }
 
@@ -926,13 +972,15 @@
           </button>`;
         }
 
-        // 4. Certificate
-        const certUrl = (item.linkCertificated && item.linkCertificated.startsWith('http')) 
-          ? item.linkCertificated 
-          : 'https://script.google.com/macros/s/AKfycbwEKynG_L-2HeuEU3PzlTu8he1PzAK2AGS_b3RRlk-pFDy6WrwuwwTQVZArG8NI-fbS/exec';
-        const certBtn = `<a href="${certUrl}" target="_blank" class="py-2 px-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 shadow-xs">
-          <i class="fa-solid fa-award text-[11px]"></i> รับเกียรติบัตร
-        </a>`;
+        // 4. Certificate (Active vs Disabled badge)
+        const hasCert = (item.linkCertificated && (item.linkCertificated.startsWith('http://') || item.linkCertificated.startsWith('https://')));
+        const certBtn = hasCert
+          ? `<a href="${item.linkCertificated}" target="_blank" class="py-2 px-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 shadow-xs">
+              <i class="fa-solid fa-award text-[11px]"></i> รับเกียรติบัตร
+            </a>`
+          : `<button disabled class="py-2 px-3 bg-slate-100 text-slate-400 rounded-xl font-medium text-xs cursor-not-allowed flex items-center justify-center gap-1.5" title="ไม่มีเกียรติบัตรสำหรับหลักสูตรนี้">
+              <i class="fa-solid fa-award text-[11px]"></i> ไม่มีเกียรติบัตร
+            </button>`;
 
         // Explicit Edit Course Button + Delete
         let adminActionTools = '';
@@ -1117,6 +1165,7 @@
       document.getElementById('formStatus').value = 'เปิดการอบรม';
       document.getElementById('formPlace').value = 'ออนไลน์ (Online)';
       document.getElementById('formLinkCertificated').value = 'https://script.google.com/macros/s/AKfycbwEKynG_L-2HeuEU3PzlTu8he1PzAK2AGS_b3RRlk-pFDy6WrwuwwTQVZArG8NI-fbS/exec';
+      toggleCertificateOption(true);
       
       updateDatePreview();
       updateGoogleMapEmbed('ออนไลน์ (Online)');
@@ -1215,7 +1264,15 @@
       
       document.getElementById('formLinkRegistration').value = course.linkRegistration || '';
       document.getElementById('formLinkName').value = course.linkName || '';
-      document.getElementById('formLinkCertificated').value = course.linkCertificated || 'https://script.google.com/macros/s/AKfycbwEKynG_L-2HeuEU3PzlTu8he1PzAK2AGS_b3RRlk-pFDy6WrwuwwTQVZArG8NI-fbS/exec';
+      
+      // Certificate Toggle Check
+      if (course.linkCertificated && (course.linkCertificated.startsWith('http://') || course.linkCertificated.startsWith('https://'))) {
+        toggleCertificateOption(true);
+        document.getElementById('formLinkCertificated').value = course.linkCertificated;
+      } else {
+        toggleCertificateOption(false);
+        document.getElementById('formLinkCertificated').value = '';
+      }
 
       const links = course.linkMaterials || [];
       document.getElementById('formLinkMaterial1').value = links[0] || '';
@@ -1253,6 +1310,7 @@
       }
 
       const finalPin = currentAdminPin || '254782115';
+      const finalCertLink = isCertificateEnabled ? document.getElementById('formLinkCertificated').value.trim() : '';
 
       const payload = {
         action: 'saveEntry',
@@ -1266,9 +1324,10 @@
         type: typeVal,
         place: finalPlace,
         status: document.getElementById('formStatus').value,
+        hasCertificate: isCertificateEnabled,
         linkRegistration: document.getElementById('formLinkRegistration').value.trim(),
         linkName: document.getElementById('formLinkName').value.trim(),
-        linkCertificated: document.getElementById('formLinkCertificated').value.trim(),
+        linkCertificated: finalCertLink,
         linkMaterial1: document.getElementById('formLinkMaterial1').value.trim(),
         linkMaterial2: document.getElementById('formLinkMaterial2').value.trim(),
         linkMaterial3: document.getElementById('formLinkMaterial3').value.trim()
