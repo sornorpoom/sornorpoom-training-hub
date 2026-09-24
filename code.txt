@@ -29,22 +29,34 @@ const HEADERS = [
 ];
 
 /**
- * ฟังก์ชันค้นหาหรือสร้างแท็บ Training Course แบบ Safe Guard
+ * ฟังก์ชันค้นหาหรือสร้างแท็บ Training Course แบบ Safe Guard (ตรวจจับแท็บที่มีข้อมูลจริง)
  */
 function getCourseSheet(ss) {
+  // 1. ค้นหาแท็บชื่อตรง 'Training Course' ที่มีข้อมูล
   let sheet = ss.getSheetByName(SHEET_NAME);
-  if (sheet) return sheet;
+  if (sheet && sheet.getLastRow() > 1) return sheet;
 
-  // ค้นหาแบบไม่คำนึงถึงตัวพิมพ์เล็กใหญ่ หรือช่องว่างหัวท้าย
+  // 2. ค้นหาแท็บอื่น ๆ ที่มีคำว่า Training หรือ Course และมีข้อมูล
   const sheets = ss.getSheets();
   for (let i = 0; i < sheets.length; i++) {
     const sName = sheets[i].getName().trim().toLowerCase();
-    if (sName === 'training course' || sName.includes('training') || sName.includes('course')) {
+    if ((sName === 'training course' || sName.includes('training') || sName.includes('course')) && sheets[i].getLastRow() > 1) {
       return sheets[i];
     }
   }
 
-  // หากไม่มีให้สร้างใหม่พร้อมกำหนดหัวตาราง
+  // 3. ค้นหาแท็บใด ๆ ใน Sheet ที่มีข้อมูลเกินกว่า 1 แถว (แถวหัวตาราง + ข้อมูล)
+  for (let i = 0; i < sheets.length; i++) {
+    if (sheets[i].getLastRow() > 1) {
+      return sheets[i];
+    }
+  }
+
+  // 4. หากมีแท็บชื่อตรงหรือแท็บแรก แต่ยังไม่มีข้อมูล
+  if (sheet) return sheet;
+  if (sheets.length > 0) return sheets[0];
+
+  // 5. หากไม่มีแท็บใดเลย ให้สร้างใหม่พร้อมหัวตาราง
   sheet = ss.insertSheet(SHEET_NAME);
   sheet.appendRow(HEADERS);
   sheet.getRange(1, 1, 1, HEADERS.length)

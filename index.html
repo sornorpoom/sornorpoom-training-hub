@@ -164,6 +164,35 @@
       background: #cbd5e1;
       border-radius: 9999px;
     }
+
+    /* ✨ Page Transition & Button Micro-Interactions */
+    @keyframes pageFadeSlide {
+      0% {
+        opacity: 0;
+        transform: translateY(14px) scale(0.99);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .animate-page-slide {
+      animation: pageFadeSlide 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .btn-page-nav {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-page-nav:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px -3px rgba(15, 23, 42, 0.16);
+    }
+    .btn-page-nav:active:not(:disabled) {
+      transform: scale(0.96) translateY(0);
+    }
   </style>
 </head>
 
@@ -355,8 +384,56 @@
 
       </div>
 
+      <!-- ==================== COURSE PAGE SUMMARY INDICATOR BANNER ==================== -->
+      <div id="pageSummaryBanner" class="hidden card-academic flex-wrap items-center justify-between gap-2.5 px-4 py-3 rounded-2xl border text-xs bg-white/95 backdrop-blur-xs shadow-2xs">
+        <div class="flex items-center gap-2 flex-wrap text-slate-700">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-blue-50 text-blue-800 font-bold border border-blue-200/80 shadow-2xs">
+            <i class="fa-solid fa-layer-group text-blue-600"></i>
+            <span id="pageSummaryCurrentBadge">หน้านี้: 5 หลักสูตร</span>
+          </span>
+          <span class="text-slate-600 font-medium">
+            (แสดงหลักสูตรลำดับที่ <strong id="pageSummaryRange" class="text-slate-900 font-bold">1 - 5</strong> จากทั้งหมด <strong id="pageSummaryTotal" class="text-slate-900 font-bold">0</strong> หลักสูตร)
+          </span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="px-3 py-1 rounded-xl bg-slate-100 text-slate-800 font-bold border border-slate-200 flex items-center gap-1.5 shadow-2xs" id="pageSummaryPageBadge">
+            <i class="fa-regular fa-file-lines text-slate-500"></i> Page 1 of 1 (หน้า 1/1)
+          </span>
+        </div>
+      </div>
+
       <!-- ==================== COURSE CARDS LIST CONTAINER ==================== -->
       <div id="courseList" class="space-y-4"></div>
+
+      <!-- ==================== PAGINATION CONTROLS (5 COURSES PER PAGE) ==================== -->
+      <div id="paginationContainer" class="hidden pt-6 pb-2 flex flex-col sm:flex-row items-center justify-between gap-3.5 border-t border-slate-200/80">
+        <div class="text-xs text-slate-600 font-medium flex items-center gap-2 flex-wrap">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-100 text-slate-800 font-bold border border-slate-200 shadow-2xs">
+            <i class="fa-solid fa-bars-staggered text-slate-500"></i>
+            <span id="pageCountSummaryText">5 courses on this page</span>
+          </span>
+          <span class="text-slate-500">
+            Showing items <strong id="pageRangeText" class="font-bold text-slate-900">1 - 5</strong> of <strong id="totalCoursesText" class="font-bold text-slate-900">0</strong> courses total
+          </span>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <!-- Previous Button (English with Motion) -->
+          <button type="button" id="prevPageBtn" onclick="goToPreviousPage()" class="btn-page-nav px-4 py-2 rounded-xl border border-slate-300/90 bg-white hover:bg-slate-900 hover:text-white text-slate-700 font-bold text-xs transition-all duration-200 flex items-center gap-2 shadow-2xs disabled:opacity-30 disabled:pointer-events-none active:scale-95 group" title="Go to Previous Page (ย้อนกลับ)">
+            <i class="fa-solid fa-chevron-left text-[10px] transition-transform group-hover:-translate-x-1 duration-200"></i>
+            <span>Previous</span>
+          </button>
+
+          <!-- Numbered Page Pills -->
+          <div id="pageNumberButtons" class="flex items-center gap-1.5"></div>
+
+          <!-- Next Button (English with Motion) -->
+          <button type="button" id="nextPageBtn" onclick="goToNextPage()" class="btn-page-nav px-4 py-2 rounded-xl border border-slate-300/90 bg-white hover:bg-slate-900 hover:text-white text-slate-700 font-bold text-xs transition-all duration-200 flex items-center gap-2 shadow-2xs disabled:opacity-30 disabled:pointer-events-none active:scale-95 group" title="Go to Next Page (หน้าถัดไป)">
+            <span>Next</span>
+            <i class="fa-solid fa-chevron-right text-[10px] transition-transform group-hover:translate-x-1 duration-200"></i>
+          </button>
+        </div>
+      </div>
 
     </div>
 
@@ -1106,55 +1183,66 @@
       updateGoogleMapEmbed(placeInput.value);
     }
 
-    // 🚀 Robust Data Fetching (GAS Engine + Direct Google Sheets GViz)
+    // 🚀 Robust Data Fetching (GAS Engine + Direct Google Sheets GViz Multi-Tier)
     async function fetchFromGoogleSheetsDirect() {
-      try {
-        const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=${encodeURIComponent('Training Course')}&tqx=out:json&t=${Date.now()}`;
-        const res = await fetch(url);
-        const text = await res.text();
-        const jsonMatch = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/);
-        if (!jsonMatch || !jsonMatch[1]) return null;
-        const data = JSON.parse(jsonMatch[1]);
-        if (!data.table || !data.table.rows) return null;
+      const endpoints = [
+        `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&t=${Date.now()}`,
+        `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=${encodeURIComponent('Training Course')}&tqx=out:json&t=${Date.now()}`,
+        `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json&t=${Date.now()}`
+      ];
 
-        const courses = [];
-        const rows = data.table.rows.map(r => (r.c || []).map(cell => (cell && cell.v !== null && cell.v !== undefined) ? cell.v : ''));
-        const startIdx = (rows.length > 0 && String(rows[0][1]).trim() === 'Topic') ? 1 : 0;
+      for (const url of endpoints) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) continue;
+          const text = await res.text();
+          const jsonMatch = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/);
+          if (!jsonMatch || !jsonMatch[1]) continue;
+          const data = JSON.parse(jsonMatch[1]);
+          if (!data.table || !data.table.rows || data.table.rows.length === 0) continue;
 
-        for (let i = startIdx; i < rows.length; i++) {
-          const row = rows[i];
-          if (!row || !row[1] || String(row[1]).trim() === '' || String(row[1]).trim() === 'Topic') continue;
+          const courses = [];
+          const rows = data.table.rows.map(r => (r.c || []).map(cell => (cell && cell.v !== null && cell.v !== undefined) ? cell.v : ''));
+          const startIdx = (rows.length > 0 && String(rows[0][1]).trim() === 'Topic') ? 1 : 0;
 
-          const rawMaterials = String(row[7] || '');
-          const materialLinks = rawMaterials
-            .split(/[\n,]+/)
-            .map(s => s.trim())
-            .filter(s => s.startsWith('http://') || s.startsWith('https://'));
+          for (let i = startIdx; i < rows.length; i++) {
+            const row = rows[i];
+            if (!row || !row[1] || String(row[1]).trim() === '' || String(row[1]).trim() === 'Topic') continue;
 
-          courses.push({
-            rowId: i + 1,
-            timestamp: row[0] || '',
-            topic: String(row[1] || '').trim(),
-            target: String(row[2] || 'ครูและบุคลากรทางการศึกษา').trim(),
-            date: String(row[3] || '-').trim(),
-            type: String(row[4] || 'online').toLowerCase().trim(),
-            place: String(row[5] || 'ออนไลน์ (Online)').trim(),
-            status: String(row[6] || 'เปิดการอบรม').trim(),
-            linkMaterials: materialLinks,
-            linkMaterialsRaw: rawMaterials,
-            linkRegistration: String(row[8] || '').trim(),
-            linkName: String(row[9] || '').trim(),
-            linkCertificated: String(row[10] || '').trim(),
-            linkRecheck: String(row[11] || '').trim(),
-            linkPadletSummary: String(row[12] || '').trim(),
-            linkTranscriptSummary: String(row[13] || '').trim()
-          });
+            const rawMaterials = String(row[7] || '');
+            const materialLinks = rawMaterials
+              .split(/[\n,]+/)
+              .map(s => s.trim())
+              .filter(s => s.startsWith('http://') || s.startsWith('https://'));
+
+            courses.push({
+              rowId: i + 1,
+              timestamp: row[0] || '',
+              topic: String(row[1] || '').trim(),
+              target: String(row[2] || 'ครูและบุคลากรทางการศึกษา').trim(),
+              date: String(row[3] || '-').trim(),
+              type: String(row[4] || 'online').toLowerCase().trim(),
+              place: String(row[5] || 'ออนไลน์ (Online)').trim(),
+              status: String(row[6] || 'เปิดการอบรม').trim(),
+              linkMaterials: materialLinks,
+              linkMaterialsRaw: rawMaterials,
+              linkRegistration: String(row[8] || '').trim(),
+              linkName: String(row[9] || '').trim(),
+              linkCertificated: String(row[10] || '').trim(),
+              linkRecheck: String(row[11] || '').trim(),
+              linkPadletSummary: String(row[12] || '').trim(),
+              linkTranscriptSummary: String(row[13] || '').trim()
+            });
+          }
+
+          if (courses.length > 0) {
+            return { success: true, courses: courses };
+          }
+        } catch (e) {
+          console.warn('Fetch fallback endpoint warning:', url, e);
         }
-
-        return { success: true, courses: courses };
-      } catch (e) {
-        return null;
       }
+      return null;
     }
 
     async function fetchData() {
@@ -1174,14 +1262,24 @@
 
       if (isGasEnvironment()) {
         google.script.run
-          .withSuccessHandler((res) => {
-            onFetchComplete();
-            renderData(res);
+          .withSuccessHandler(async (res) => {
+            if (res && res.success && res.courses && res.courses.length > 0) {
+              onFetchComplete();
+              renderData(res);
+            } else {
+              const fallback = await fetchFromGoogleSheetsDirect();
+              onFetchComplete();
+              if (fallback && fallback.courses && fallback.courses.length > 0) {
+                renderData(fallback);
+              } else {
+                renderData(res || { success: true, courses: [] });
+              }
+            }
           })
           .withFailureHandler(async (err) => {
             const fallback = await fetchFromGoogleSheetsDirect();
             onFetchComplete();
-            if (fallback && fallback.courses.length > 0) {
+            if (fallback && fallback.courses && fallback.courses.length > 0) {
               renderData(fallback);
             } else {
               document.getElementById('loading').classList.add('hidden');
@@ -1192,7 +1290,7 @@
           .getTrainingPortalData();
       } else {
         const directData = await fetchFromGoogleSheetsDirect();
-        if (directData && directData.courses.length > 0) {
+        if (directData && directData.courses && directData.courses.length > 0) {
           onFetchComplete();
           renderData(directData);
         } else {
@@ -1204,7 +1302,13 @@
             .then(res => res.json())
             .then(data => {
               onFetchComplete();
-              renderData(data);
+              if (data && data.courses && data.courses.length > 0) {
+                renderData(data);
+              } else if (directData) {
+                renderData(directData);
+              } else {
+                renderData({ success: true, courses: [] });
+              }
             })
             .catch(() => {
               onFetchComplete();
@@ -1236,12 +1340,17 @@
       filterCourses();
     }
 
+    // 📄 Pagination & Filtering State (5 courses per page)
+    const PAGE_SIZE = 5;
+    let currentPage = 1;
+    let currentFilteredCourses = [];
+
     // 🔍 Search, Filter, and Chronological Sort
     function toggleSortOrder() {
       sortAscending = !sortAscending;
       const label = document.getElementById('sortOrderLabel');
       label.innerText = sortAscending ? 'เรียงวันที่ (เก่าไปใหม่)' : 'เรียงวันที่ (ล่าสุดก่อน)';
-      filterCourses();
+      filterCourses(true);
     }
 
     function setQuickStatusFilter(status) {
@@ -1256,12 +1365,12 @@
       filterCourses();
     }
 
-    function filterCourses() {
+    function filterCourses(keepPage = false) {
       const search = (document.getElementById('courseSearchInput').value || '').toLowerCase().trim();
       const typeFilter = document.getElementById('typeFilter').value;
       const statusFilter = document.getElementById('statusFilter').value;
 
-      let filtered = allCoursesData.filter(c => {
+      currentFilteredCourses = allCoursesData.filter(c => {
         const matchSearch = !search || 
           (c.topic && c.topic.toLowerCase().includes(search)) || 
           (c.target && c.target.toLowerCase().includes(search)) ||
@@ -1280,16 +1389,148 @@
       });
 
       // Sort Chronologically by Date
-      filtered.sort((a, b) => {
+      currentFilteredCourses.sort((a, b) => {
         const timeA = parseThaiDateToTimestamp(a.date);
         const timeB = parseThaiDateToTimestamp(b.date);
         return sortAscending ? (timeA - timeB) : (timeB - timeA);
       });
 
-      renderCourseList(filtered);
+      if (!keepPage) {
+        currentPage = 1;
+      }
+
+      renderCurrentPage();
     }
 
-    function renderCourseList(courses) {
+    // 📑 Render Current Page (5 Courses per page with Page Summary & Motion)
+    function renderCurrentPage() {
+      const totalItems = currentFilteredCourses.length;
+      const totalPages = Math.ceil(totalItems / PAGE_SIZE) || 1;
+
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+
+      const startIndex = (currentPage - 1) * PAGE_SIZE;
+      const endIndex = Math.min(startIndex + PAGE_SIZE, totalItems);
+      const pageCourses = currentFilteredCourses.slice(startIndex, endIndex);
+
+      const listContainer = document.getElementById('courseList');
+      if (listContainer) {
+        listContainer.classList.remove('animate-page-slide');
+        void listContainer.offsetWidth; // trigger reflow for smooth re-animation
+        listContainer.classList.add('animate-page-slide');
+      }
+
+      renderCourseList(pageCourses, startIndex);
+      updatePaginationControls(totalItems, totalPages, startIndex, endIndex, pageCourses.length);
+    }
+
+    function updatePaginationControls(totalItems, totalPages, startIndex, endIndex, currentPageCount) {
+      const pagContainer = document.getElementById('paginationContainer');
+      const pageSummaryBanner = document.getElementById('pageSummaryBanner');
+      const pageRangeText = document.getElementById('pageRangeText');
+      const totalCoursesText = document.getElementById('totalCoursesText');
+      const pageCountSummaryText = document.getElementById('pageCountSummaryText');
+      const prevBtn = document.getElementById('prevPageBtn');
+      const nextBtn = document.getElementById('nextPageBtn');
+      const pageNumBtns = document.getElementById('pageNumberButtons');
+
+      // Top Page Summary Elements
+      const summaryCurrentBadge = document.getElementById('pageSummaryCurrentBadge');
+      const summaryRange = document.getElementById('pageSummaryRange');
+      const summaryTotal = document.getElementById('pageSummaryTotal');
+      const summaryPageBadge = document.getElementById('pageSummaryPageBadge');
+
+      if (totalItems === 0) {
+        if (pagContainer) pagContainer.classList.add('hidden');
+        if (pageSummaryBanner) {
+          pageSummaryBanner.classList.add('hidden');
+          pageSummaryBanner.classList.remove('flex');
+        }
+        return;
+      }
+
+      // Show and update top summary banner
+      if (pageSummaryBanner) {
+        pageSummaryBanner.classList.remove('hidden');
+        pageSummaryBanner.classList.add('flex');
+        if (summaryCurrentBadge) summaryCurrentBadge.innerText = `หน้านี้: ${currentPageCount} หลักสูตร`;
+        if (summaryRange) summaryRange.innerText = `${startIndex + 1} - ${endIndex}`;
+        if (summaryTotal) summaryTotal.innerText = `${totalItems}`;
+        if (summaryPageBadge) summaryPageBadge.innerHTML = `<i class="fa-regular fa-file-lines text-slate-500"></i> Page ${currentPage} of ${totalPages} (หน้า ${currentPage}/${totalPages})`;
+      }
+
+      if (pagContainer) {
+        pagContainer.classList.remove('hidden');
+      }
+
+      if (pageRangeText) pageRangeText.innerText = `${startIndex + 1} - ${endIndex}`;
+      if (totalCoursesText) totalCoursesText.innerText = totalItems;
+      if (pageCountSummaryText) pageCountSummaryText.innerText = `${currentPageCount} courses on this page (${currentPageCount} หลักสูตรในหน้านี้)`;
+
+      if (prevBtn) {
+        prevBtn.disabled = (currentPage <= 1);
+      }
+      if (nextBtn) {
+        nextBtn.disabled = (currentPage >= totalPages);
+      }
+
+      if (pageNumBtns) {
+        pageNumBtns.innerHTML = '';
+        for (let i = 1; i <= totalPages; i++) {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.innerText = i;
+          if (i === currentPage) {
+            btn.className = 'w-8 h-8 rounded-xl bg-slate-900 text-white font-bold text-xs shadow-sm transition scale-105';
+          } else {
+            btn.className = 'w-8 h-8 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-medium text-xs border border-slate-200 shadow-2xs hover:scale-105 transition';
+            btn.onclick = () => goToPage(i);
+          }
+          pageNumBtns.appendChild(btn);
+        }
+      }
+    }
+
+    function goToPreviousPage() {
+      if (currentPage > 1) {
+        currentPage--;
+        renderCurrentPage();
+        scrollToCourseList();
+      }
+    }
+
+    function goToNextPage() {
+      const totalPages = Math.ceil(currentFilteredCourses.length / PAGE_SIZE) || 1;
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderCurrentPage();
+        scrollToCourseList();
+      }
+    }
+
+    function goToPage(pageNum) {
+      currentPage = pageNum;
+      renderCurrentPage();
+      scrollToCourseList();
+    }
+
+    function scrollToCourseList() {
+      const target = document.getElementById('courseList');
+      if (target) {
+        const offset = 90;
+        const bodyRect = document.body.getBoundingClientRect().top;
+        const elementRect = target.getBoundingClientRect().top;
+        const elementPosition = elementRect - bodyRect;
+        const offsetPosition = elementPosition - offset;
+        window.scrollTo({
+          top: Math.max(0, offsetPosition),
+          behavior: 'smooth'
+        });
+      }
+    }
+
+    function renderCourseList(courses, startIndex = 0) {
       const listContainer = document.getElementById('courseList');
       listContainer.innerHTML = '';
 
@@ -1314,12 +1555,15 @@
         const card = document.createElement('div');
         const isOpen = (item.status === 'เปิดการอบรม' || item.status === 'open');
         const isEven = (index % 2 === 0);
+        const itemSeqNumber = startIndex + index + 1;
 
         if (isOpen) {
           card.className = `card-academic course-card rounded-2xl p-4 sm:p-5 border shadow-sm space-y-3.5 course-card-open-${isEven ? '0' : '1'}`;
         } else {
           card.className = `card-academic course-card rounded-2xl p-4 sm:p-5 border shadow-2xs space-y-3.5 course-card-closed-${isEven ? '0' : '1'}`;
         }
+
+        const seqBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-bold bg-slate-900 text-white shadow-2xs" title="หลักสูตรลำดับที่ ${itemSeqNumber}">ลำดับที่ ${itemSeqNumber}</span>`;
 
         const statusBadge = isOpen 
           ? '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> เปิดการอบรม</span>'
@@ -1421,8 +1665,8 @@
             </button>`;
 
         // 📑 Post-Training Outcomes (ผลการอบรม & การถอดบทเรียน: Padlet & Audio Transcript)
-        const padletUrl = sanitizeUrl(item.linkPadletSummary);
-        const transcriptUrl = sanitizeUrl(item.linkTranscriptSummary);
+        const padletUrl = sanitizeUrl(item.linkPadlet || item.linkPadletSummary);
+        const transcriptUrl = sanitizeUrl(item.linkSummary || item.linkTranscriptSummary);
         const hasPadlet = !!padletUrl;
         const hasTranscript = !!transcriptUrl;
         let outcomeSection = '';
@@ -1480,6 +1724,7 @@
           <!-- Badges & Meta Top Row -->
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div class="flex items-center gap-2 flex-wrap">
+              ${seqBadge}
               ${statusBadge}
               ${typeBadge}
               <span class="text-xs bg-slate-100/90 text-slate-700 font-medium px-2.5 py-0.5 rounded-lg border border-slate-200/80">
@@ -1571,7 +1816,7 @@
             currentAdminPin = null;
             document.getElementById('adminStatusBar').classList.add('hidden');
             document.getElementById('adminBtnLabel').innerText = 'ผู้ดูแลระบบ';
-            filterCourses();
+            filterCourses(true);
           }
         });
         return;
@@ -1614,7 +1859,7 @@
         if (result.isConfirmed && currentAdminPin) {
           document.getElementById('adminStatusBar').classList.remove('hidden');
           document.getElementById('adminBtnLabel').innerText = 'ออกจากระบบ';
-          filterCourses();
+          filterCourses(true);
           Swal.fire({
             icon: 'success',
             title: 'ยินดีต้อนรับ ศน.รัชภูมิ',
