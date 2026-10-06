@@ -193,6 +193,36 @@
     .btn-page-nav:active:not(:disabled) {
       transform: scale(0.96) translateY(0);
     }
+
+    /* 🌟 Vibrant Course Sequence Badge */
+    .badge-seq-vibrant {
+      background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
+      color: #ffffff;
+      font-size: 13px; /* เพิ่มขนาดฟอนต์ 3-5% ให้เด่นชัด */
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      padding: 3.5px 12px;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px -2px rgba(79, 70, 229, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .badge-seq-vibrant:hover {
+      transform: scale(1.04);
+      box-shadow: 0 5px 14px -2px rgba(79, 70, 229, 0.55);
+    }
+    body.theme-forest .badge-seq-vibrant {
+      background: linear-gradient(135deg, #059669 0%, #0d9488 50%, #0284c7 100%);
+      box-shadow: 0 3px 10px -2px rgba(5, 150, 105, 0.45);
+    }
+    body.theme-warm .badge-seq-vibrant {
+      background: linear-gradient(135deg, #ea580c 0%, #d97706 50%, #e11d48 100%);
+      box-shadow: 0 3px 10px -2px rgba(234, 88, 12, 0.45);
+    }
   </style>
 </head>
 
@@ -1563,11 +1593,23 @@
           card.className = `card-academic course-card rounded-2xl p-4 sm:p-5 border shadow-2xs space-y-3.5 course-card-closed-${isEven ? '0' : '1'}`;
         }
 
-        const seqBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-bold bg-slate-900 text-white shadow-2xs" title="หลักสูตรลำดับที่ ${itemSeqNumber}">ลำดับที่ ${itemSeqNumber}</span>`;
+        const seqBadge = `<span class="badge-seq-vibrant" title="หลักสูตรลำดับที่ ${itemSeqNumber}">
+          <i class="fa-solid fa-hashtag text-[11px] opacity-85"></i> ลำดับที่ ${itemSeqNumber}
+        </span>`;
 
         const statusBadge = isOpen 
-          ? '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> เปิดการอบรม</span>'
-          : '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> อบรมเสร็จแล้ว</span>';
+          ? `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-2xs">
+              <img 
+                src="https://lh3.googleusercontent.com/d/1HNvyeVBO9JWw_d_Tu1or0YebbRc0TdWY" 
+                alt="Active" 
+                class="w-4 h-4 object-contain inline-block shrink-0 -my-0.5" 
+                onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=1HNvyeVBO9JWw_d_Tu1or0YebbRc0TdWY&sz=w200';" 
+              />
+              เปิดการอบรม
+            </span>`
+          : `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> อบรมเสร็จแล้ว
+            </span>`;
 
         let typeBadge = '';
         if (item.type === 'online') {
@@ -1738,10 +1780,18 @@
             </div>
           </div>
 
-          <!-- Course Topic -->
+          <!-- Course Topic (with Animated Icon for Open Courses) -->
           <div>
-            <h3 class="text-base sm:text-lg font-bold text-slate-900 leading-snug tracking-tight">
-              ${item.topic}
+            <h3 class="text-base sm:text-lg font-bold text-slate-900 leading-snug tracking-tight flex items-start gap-2.5">
+              ${isOpen ? `
+                <img 
+                  src="https://lh3.googleusercontent.com/d/1HNvyeVBO9JWw_d_Tu1or0YebbRc0TdWY" 
+                  alt="เปิดการอบรม" 
+                  class="w-6 h-6 sm:w-7 sm:h-7 object-contain inline-block shrink-0 mt-0.5 filter drop-shadow-xs" 
+                  title="หลักสูตรกำลังเปิดการอบรม (เปิดรับสมัคร / กำลังดำเนินการ)" 
+                  onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=1HNvyeVBO9JWw_d_Tu1or0YebbRc0TdWY&sz=w200';" 
+                />` : ''}
+              <span class="flex-1">${item.topic}</span>
             </h3>
             <div class="mt-1.5">${placeDisplay}</div>
           </div>
