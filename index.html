@@ -349,6 +349,14 @@
         </div>
       </div>
 
+      <!-- V1.6: analytics and view controls -->
+      <section id="smartDashboard" class="hidden card-academic rounded-2xl border p-4 space-y-4 text-slate-800">
+        <div class="flex flex-wrap justify-between items-center gap-2"><div><h2 class="font-bold text-lg">Smart Dashboard · V1.6</h2><p class="text-xs text-slate-500">สถิติจากหลักสูตรตามตัวกรองปัจจุบัน (ไม่รวมถังขยะ)</p></div><div class="flex gap-2"><button onclick="exportTrainingCsv()" class="bg-emerald-700 text-white rounded-lg px-3 py-2 text-xs">CSV</button><button onclick="printTrainingReport()" class="bg-blue-700 text-white rounded-lg px-3 py-2 text-xs">รายงาน PDF / พิมพ์</button></div></div>
+        <div id="smartMetrics" class="grid grid-cols-2 lg:grid-cols-4 gap-2"></div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4"><div><h3 class="font-semibold text-sm mb-2">จำนวนหลักสูตรรายเดือน (รวมปีที่เลือก)</h3><div id="smartMonthly" class="space-y-1"></div></div><div><h3 class="font-semibold text-sm mb-2">รูปแบบและสถานะตามกำหนดการ</h3><div id="smartTypes" class="space-y-2"></div><div id="smartTiming" class="space-y-1 mt-4"></div></div></div>
+      </section>
+      <div class="card-academic rounded-xl border p-3 flex flex-wrap items-center gap-2 text-xs text-slate-700"><span class="font-semibold">มุมมอง:</span><button data-view="list" onclick="setTrainingView('list')" class="px-3 py-2 rounded-lg border">รายการ</button><button data-view="grid" onclick="setTrainingView('grid')" class="px-3 py-2 rounded-lg border">ตารางการ์ด</button><button data-view="calendar" onclick="setTrainingView('calendar')" class="px-3 py-2 rounded-lg border">ปฏิทิน</button><span class="text-slate-500">สถานะตามเวลาแสดงเพื่อประกอบการตัดสินใจ ไม่เปลี่ยนสถานะที่ Admin บันทึก</span></div>
+      <section id="trainingCalendar" class="hidden card-academic rounded-2xl border p-3 sm:p-5 space-y-3 text-slate-800"><div class="flex items-center justify-between gap-2"><button onclick="moveTrainingMonth(-1)" class="border rounded-lg px-3 py-2" aria-label="เดือนก่อน">‹</button><h2 id="trainingMonthLabel" class="font-bold"></h2><button onclick="moveTrainingMonth(1)" class="border rounded-lg px-3 py-2" aria-label="เดือนถัดไป">›</button><button onclick="resetTrainingMonth()" class="border rounded-lg px-3 py-2 text-xs">วันนี้</button></div><div id="trainingCalendarDays" class="grid grid-cols-7 gap-1"></div><div id="trainingCalendarEvents" class="space-y-2"></div></section>
       <!-- COURSE PAGE SUMMARY INDICATOR BANNER -->
       <div id="pageSummaryBanner" class="hidden card-academic flex-wrap items-center justify-between gap-2.5 px-4 py-3 rounded-2xl border text-xs bg-white/95 backdrop-blur-xs shadow-2xs">
         <div class="flex items-center gap-2 flex-wrap text-slate-700">
@@ -979,24 +987,7 @@
       return { isoDate: parsedIsoDate, startTime: parsedStartTime, endTime: parsedEndTime };
     }
 
-    function parseThaiDateToTimestamp(dateStr) {
-      if (!dateStr) return 0;
-      try {
-        let cleanStr = dateStr.split('เวลา')[0].trim();
-        for (let m = 0; m < THAI_MONTHS.length; m++) {
-          if (cleanStr.includes(THAI_MONTHS[m])) {
-            const parts = cleanStr.split(THAI_MONTHS[m]);
-            const day = parseInt(parts[0].replace(/\D/g, ''), 10) || 1;
-            let year = parseInt(parts[1].replace(/\D/g, ''), 10) || 2569;
-            if (year > 2400) year -= 543;
-            return new Date(year, m, day).getTime();
-          }
-        }
-        const isoParsed = Date.parse(dateStr);
-        if (!isNaN(isoParsed)) return isoParsed;
-      } catch (e) {}
-      return 0;
-    }
+    function parseThaiDateToTimestamp(dateStr) {const x=schedule16({date:dateStr});return x?new Date(x.y,x.m-1,x.d).getTime():0;}
 
     function updateDatePreview() {
       const dateVal = document.getElementById('formDatePicker').value;
@@ -1157,6 +1148,15 @@
         listContainer.classList.add('animate-page-slide');
       }
 
+      renderSmartDashboard16();
+      document.querySelectorAll('[data-view]').forEach(b=>{b.classList.toggle('bg-blue-700',b.dataset.view===trainingView);b.classList.toggle('text-white',b.dataset.view===trainingView);b.setAttribute('aria-pressed',String(b.dataset.view===trainingView));});
+      document.getElementById('trainingCalendar').classList.toggle('hidden',trainingView!=='calendar');
+      listContainer.classList.toggle('hidden',trainingView==='calendar');
+      listContainer.classList.toggle('grid',trainingView==='grid');
+      listContainer.classList.toggle('lg:grid-cols-2',trainingView==='grid');
+      listContainer.classList.toggle('gap-4',trainingView==='grid');
+      listContainer.classList.toggle('space-y-4',trainingView!=='grid');
+      if(trainingView==='calendar'){document.getElementById('paginationContainer').classList.add('hidden');document.getElementById('pageSummaryBanner').classList.add('hidden');renderTrainingCalendar();return;}
       renderCourseList(pageCourses, startIndex);
       updatePaginationControls(totalItems, totalPages, startIndex, endIndex, pageCourses.length);
     }
@@ -1455,7 +1455,7 @@
           adminActionTools = `
             <div class="flex items-center justify-between border-t border-slate-100 pt-2 text-xs">
               <span class="text-[11px] text-slate-400">บันทึกเมื่อ: ${escapeHtml(item.timestamp || '-')}</span>
-              <div class="flex items-center gap-1.5">
+              <div class="flex flex-wrap items-center gap-1.5">
                 <button onclick="editCourseEntry('${encodeItem(item)}')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 rounded-lg transition flex items-center gap-1 font-semibold">
                   <i class="fa-solid fa-pen-to-square text-amber-600"></i> แก้ไขหลักสูตร
                 </button>
@@ -1499,6 +1499,7 @@
             ${certBtn}
           </div>
           ${outcomeSection}
+          ${smartExtras16(item)}
           ${adminActionTools}
         `;
         listContainer.appendChild(card);
@@ -1848,9 +1849,42 @@
       }
     }
 
+
+    // V1.6 — presentation-only additions, V1.5 mutation/API contract unchanged.
+    let trainingView='list', trainingMonth=null, trainingSelected=null;
+    const monthShort16=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    function bangkokToday16(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Bangkok',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
+    function schedule16(c){
+      const raw=String(c.date||'').trim(); let y,m,d;
+      let q=raw.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?=\s|T|$)/);
+      if(q){y=+q[1];m=+q[2];d=+q[3];}else if(q=raw.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})(?=\s|$)/)){d=+q[1];m=+q[2];y=+q[3];}else{
+        for(let i=0;i<12;i++){const names=[THAI_MONTHS[i],monthShort16[i]];for(const n of names){if(!raw.includes(n))continue;const parts=raw.split(n);const a=parts[0].trim().match(/^(\d{1,2})$/), b=parts[1].trim().match(/^(\d{4})(?=\s|$)/);if(a&&b){d=+a[1];m=i+1;y=+b[1];break;}}if(y)break;}
+      }
+      if(y>2400)y-=543;if(!y||!m||!d||y<1900||y>2200)return null;
+      const dt=new Date(Date.UTC(y,m-1,d));if(dt.getUTCFullYear()!==y||dt.getUTCMonth()!==m-1||dt.getUTCDate()!==d)return null;
+      const iso=dt.toISOString().slice(0,10);const t=raw.match(/(\d{1,2})[.:](\d{2})\s*(?:-|–|ถึง|to)\s*(\d{1,2})[.:](\d{2})/i);
+      let start=null,end=null;if(t&&+t[1]<24&&+t[3]<24&&+t[2]<60&&+t[4]<60){const time=(h,min)=>h.padStart(2,'0')+':'+min;const a=time(t[1],t[2]),b=time(t[3],t[4]);if(b>a){start=a;end=b;}}
+      return {iso,y,m,d,start,end};
+    }
+    function timing16(c,now=Date.now()){const x=schedule16(c);if(!x)return 'ไม่ทราบกำหนดการ';if(x.start){const a=Date.parse(x.iso+'T'+x.start+':00+07:00'),b=Date.parse(x.iso+'T'+x.end+':00+07:00');return now<a?'ยังไม่ถึงกำหนด':now<b?'กำลังอบรม':'ผ่านกำหนดแล้ว';}const today=bangkokToday16();return x.iso>today?'ยังไม่ถึงกำหนด':x.iso<today?'ผ่านกำหนดแล้ว':'อบรมวันนี้ (ไม่ระบุเวลา)';}
+    function readiness16(c){const valid=v=>{try{return ['http:','https:'].includes(new URL(v).protocol);}catch(e){return false;}};const checks=[['ชื่อหลักสูตร',!!String(c.topic||'').trim()],['กลุ่มเป้าหมาย',!!String(c.target||'').trim()],['วันที่และเวลา',!!schedule16(c)?.start],['รูปแบบและสถานที่',['online','onsite','hybrid'].includes(c.type)&&!!String(c.place||'').trim()]];const resources=[['สมัครอบรม',valid(c.linkRegistration)],['รายชื่อ',valid(c.linkName)],['เอกสาร',(c.linkMaterials||[]).some(valid)],['ตรวจความถูกต้อง',valid(c.linkRecheck)],['เกียรติบัตร',valid(c.linkCertificated)],['Padlet',valid(c.linkPadlet)],['สรุปผล',valid(c.linkSummary)]];return {checks,resources,ready:checks.filter(x=>x[1]).length};}
+    function showReadiness16(encoded){const c=JSON.parse(decodeURIComponent(encoded)),r=readiness16(c);Swal.fire({title:'ความพร้อมหลักสูตร',html:'<div class="text-left text-sm space-y-2"><p class="font-bold">'+escapeHtml(c.topic)+'</p><p>ข้อมูลพื้นฐาน '+r.ready+'/4</p>'+r.checks.map(([n,v])=>'<p>'+(v?'✓ ':'○ ')+n+'</p>').join('')+'<p class="font-bold mt-3">บริการเสริม (ไม่บังคับ)</p>'+r.resources.map(([n,v])=>'<p>'+(v?'✓ ':'○ ')+n+'</p>').join('')+'<p class="text-xs text-slate-500">ตรวจเฉพาะข้อมูลและรูปแบบ URL ไม่ได้ตรวจว่าลิงก์ปลายทางใช้งานได้จริง</p></div>'});}
+    function calendarLink16(c){const x=schedule16(c);if(!x)return '';const u=new URL('https://calendar.google.com/calendar/render');u.searchParams.set('action','TEMPLATE');u.searchParams.set('text',c.topic||'');u.searchParams.set('location',c.place||'');u.searchParams.set('details',c.target||'');const compact=x.iso.replace(/-/g,'');if(x.start){u.searchParams.set('dates',compact+'T'+x.start.replace(':','')+'00/'+compact+'T'+x.end.replace(':','')+'00');u.searchParams.set('ctz','Asia/Bangkok');}else{const next=new Date(Date.UTC(x.y,x.m-1,x.d+1)).toISOString().slice(0,10).replace(/-/g,'');u.searchParams.set('dates',compact+'/'+next);}return u.href;}
+    function smartExtras16(c){const link=calendarLink16(c),r=readiness16(c);return '<div class="flex flex-wrap items-center gap-2 text-xs"><span class="rounded-lg bg-slate-100 px-2 py-1 text-slate-700">'+escapeHtml(timing16(c))+'</span>'+(link?'<a class="rounded-lg border px-2 py-1 text-blue-700" target="_blank" rel="noopener noreferrer" href="'+escapeHtml(link)+'"><i class="fa-regular fa-calendar-plus"></i> Google Calendar</a>':'')+(currentAdminPin?'<button class="rounded-lg border px-2 py-1 text-teal-800" onclick="showReadiness16(\''+encodeItem(c)+'\')">ความพร้อม '+r.ready+'/4</button>':'')+'</div>';}
+    function bar16(n,v,total){return '<div class="flex items-center gap-2 text-xs"><span class="w-28 shrink-0">'+escapeHtml(n)+'</span><div class="flex-1 bg-slate-100 rounded-full h-2 overflow-hidden"><div class="bg-blue-500 h-full rounded-full" style="width:'+Math.round(v/Math.max(1,total)*100)+'%"></div></div><span class="w-8 text-right">'+v+'</span></div>';}
+    function renderSmartDashboard16(){const el=document.getElementById('smartDashboard');el.classList.toggle('hidden',!currentAdminPin);if(!currentAdminPin){['smartMetrics','smartMonthly','smartTypes','smartTiming'].forEach(id=>document.getElementById(id).replaceChildren());return;}const cs=currentFilteredCourses,n=cs.length,open=cs.filter(c=>['open','เปิดการอบรม'].includes(c.status)).length,done=cs.filter(c=>['อบรมเสร็จแล้ว','closed','close','completed'].includes(c.status)).length,ready=cs.filter(c=>readiness16(c).ready===4).length;document.getElementById('smartMetrics').innerHTML=[['หลักสูตรทั้งหมด',n],['เปิดการอบรม',open],['อบรมเสร็จแล้ว',done],['ข้อมูลพื้นฐานครบ',ready]].map(([l,v])=>'<div class="bg-slate-50 border rounded-xl p-3"><p class="text-xs text-slate-500">'+l+'</p><p class="text-2xl font-bold text-blue-800">'+v+'</p></div>').join('');const counts=Array(12).fill(0);cs.forEach(c=>{const x=schedule16(c);if(x)counts[x.m-1]++;});document.getElementById('smartMonthly').innerHTML=counts.map((v,i)=>bar16(monthShort16[i],v,Math.max(...counts,1))).join('');document.getElementById('smartTypes').innerHTML=['online','onsite','hybrid'].map(t=>bar16(t.toUpperCase(),cs.filter(c=>c.type===t).length,n)).join('')+bar16('อื่น ๆ',cs.filter(c=>!['online','onsite','hybrid'].includes(c.type)).length,n);document.getElementById('smartTiming').innerHTML=['ยังไม่ถึงกำหนด','กำลังอบรม','อบรมวันนี้ (ไม่ระบุเวลา)','ผ่านกำหนดแล้ว','ไม่ทราบกำหนดการ'].map(t=>bar16(t,cs.filter(c=>timing16(c)===t).length,n)).join('');}
+    function resetTrainingMonth(){const today=bangkokToday16();trainingMonth=today.slice(0,7);trainingSelected=today;renderTrainingCalendar();}
+    function moveTrainingMonth(delta){if(!trainingMonth)resetTrainingMonth();const [y,m]=trainingMonth.split('-').map(Number);trainingMonth=new Date(Date.UTC(y,m-1+delta,1)).toISOString().slice(0,7);trainingSelected=trainingMonth+'-01';renderTrainingCalendar();}
+    function selectTrainingDay(iso){trainingSelected=iso;renderTrainingCalendar();}
+    function renderTrainingCalendar(){if(!trainingMonth){const today=bangkokToday16();trainingMonth=today.slice(0,7);trainingSelected=today;}const [y,m]=trainingMonth.split('-').map(Number),first=new Date(Date.UTC(y,m-1,1)).getUTCDay(),last=new Date(Date.UTC(y,m,0)).getUTCDate();document.getElementById('trainingMonthLabel').textContent=THAI_MONTHS[m-1]+' '+(y+543);const days=new Map();currentFilteredCourses.forEach(c=>{const x=schedule16(c);if(x){if(!days.has(x.iso))days.set(x.iso,[]);days.get(x.iso).push(c);}});let html=['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'].map(x=>'<div class="text-center text-xs font-bold">'+x+'</div>').join('')+'<div></div>'.repeat(first);for(let d=1;d<=last;d++){const iso=trainingMonth+'-'+String(d).padStart(2,'0'),n=(days.get(iso)||[]).length;html+='<button onclick="selectTrainingDay(\''+iso+'\')" class="min-h-[48px] border rounded-lg p-1 text-xs '+(iso===trainingSelected?'bg-blue-700 text-white':n?'bg-blue-50 text-blue-800':'bg-white text-slate-700')+'">'+d+(n?'<div class="font-bold">'+n+' <span class="hidden sm:inline">อบรม</span></div>':'')+'</button>';}document.getElementById('trainingCalendarDays').innerHTML=html;const selected=days.get(trainingSelected)||[];const out=document.getElementById('trainingCalendarEvents');out.innerHTML='<h3 class="font-semibold text-sm">'+escapeHtml(formatThaiDateString(trainingSelected))+' · '+selected.length+' หลักสูตร</h3>';const oldList=document.getElementById('courseList');renderCourseList(selected,0);while(oldList.firstChild)out.appendChild(oldList.firstChild);}
+    function setTrainingView(mode){trainingView=mode;currentPage=1;renderCurrentPage();}
+    function exportTrainingCsv(){if(!currentAdminPin)return;const cell=v=>'"'+String(v??'').replace(/^[\s]*[=+@-]/,m=>"'"+m).replace(/"/g,'""')+'"';const rows=[['หลักสูตร','กลุ่มเป้าหมาย','กำหนดการ','รูปแบบ','สถานที่','สถานะที่บันทึก','สถานะตามเวลา','ความพร้อมพื้นฐาน'],...currentFilteredCourses.map(c=>[c.topic,c.target,c.date,c.type,c.place,c.status,timing16(c),readiness16(c).ready+'/4'])];const url=URL.createObjectURL(new Blob(['\ufeff'+rows.map(r=>r.map(cell).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='training-report-'+bangkokToday16()+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+    function printTrainingReport(){if(!currentAdminPin)return;const w=window.open('','_blank');if(!w){Swal.fire('กรุณาอนุญาตหน้าต่างป๊อปอัป');return;}w.document.write('<!doctype html><html lang="th"><meta charset="utf-8"><title>รายงานการอบรม</title><style>@page{size:A4 landscape;margin:12mm}body{font:12px sans-serif;color:#111}table{border-collapse:collapse;width:100%}td,th{border:1px solid #aaa;padding:6px;text-align:left}th{background:#eee}tr{break-inside:avoid}h1{font-size:20px}</style><h1>รายงานสรุปการจัดอบรม</h1><p>สำนักงานศึกษาธิการจังหวัดเชียงใหม่ · '+escapeHtml(bangkokToday16())+' · '+currentFilteredCourses.length+' หลักสูตร (ตามตัวกรอง)</p><table><thead><tr>'+['ลำดับ','หลักสูตร','กลุ่มเป้าหมาย','กำหนดการ','รูปแบบ','สถานะ','ความพร้อม'].map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>'+currentFilteredCourses.map((c,i)=>'<tr>'+[i+1,c.topic,c.target,c.date,c.type,c.status,readiness16(c).ready+'/4'].map(x=>'<td>'+escapeHtml(x)+'</td>').join('')+'</tr>').join('')+'</tbody></table></html>');w.document.close();w.focus();w.print();}
+
     window.addEventListener('DOMContentLoaded', () => {
       initTime24Dropdowns();
       fetchData();
+      setInterval(()=>{if(!document.hidden&&document.getElementById("contentArea")&&!document.getElementById("contentArea").classList.contains("hidden"))renderCurrentPage();},60000);
     });
   </script>
 </body>
