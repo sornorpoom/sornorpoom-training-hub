@@ -261,7 +261,7 @@
         <button onclick="openEditCourseSelector()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-lg font-semibold transition flex items-center gap-1.5 shadow-sm" title="เลือกหลักสูตรเพื่อแก้ไข">
           <i class="fa-solid fa-pen-to-square"></i> แก้ไขหลักสูตร
         </button>
-        <a href="https://docs.google.com/spreadsheets/d/14ZTGU9GJXXE0Kld8DSeeMG8wCQxooDgyIB2qKhKol-I/edit?usp=sharing" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-green-700 hover:bg-green-600 text-white rounded-lg font-semibold transition flex items-center gap-1.5 shadow-sm" title="เปิดฐานข้อมูล Google Sheets">
+        <a href="https://docs.google.com/spreadsheets/d/14ZTGU9GJXXE0Kld8DSeeMG8wCQxooDgyIB2qKhKol-I/edit?usp=sharing" target="_blank" rel="noopener noreferrer" rel="noopener noreferrer" class="px-3 py-1.5 bg-green-700 hover:bg-green-600 text-white rounded-lg font-semibold transition flex items-center gap-1.5 shadow-sm" title="เปิดฐานข้อมูล Google Sheets">
           <i class="fa-solid fa-table-cells"></i> Google Sheets <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
         </a>
         <button onclick="openApiConfigModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition" title="ตั้งค่า Web App API URL">
@@ -338,6 +338,7 @@
               <option value="completed">อบรมเสร็จแล้ว</option>
             </select>
           </div>
+          <select id="yearFilter" onchange="filterCourses()" class="bg-slate-50 border rounded-lg p-2"><option value="all">ทุกปี</option></select><select id="yearMode" onchange="updateYears();filterCourses()" class="bg-slate-50 border rounded-lg p-2"><option value="calendar">ปีปฏิทิน</option><option value="academic">ปีการศึกษา</option><option value="fiscal">ปีงบประมาณ</option></select>
           <button onclick="toggleSortOrder()" id="sortOrderBtn" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium transition flex items-center gap-1.5 border border-slate-200" title="สลับลำดับการเรียง">
             <i class="fa-solid fa-arrow-down-wide-short"></i>
             <span id="sortOrderLabel">เรียงวันที่ (ล่าสุดก่อน)</span>
@@ -512,7 +513,7 @@
                 <button type="button" onclick="searchGoogleMap()" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-medium shrink-0 transition flex items-center gap-1 shadow-sm">
                   <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
-                <a id="openGMapBtn" href="https://www.google.com/maps" target="_blank" class="px-2.5 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-xl text-xs font-medium shrink-0 transition flex items-center" title="เปิด Google Maps">
+                <a id="openGMapBtn" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer" class="px-2.5 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-xl text-xs font-medium shrink-0 transition flex items-center" title="เปิด Google Maps">
                   <i class="fa-brands fa-google text-rose-500"></i>
                 </a>
               </div>
@@ -1056,117 +1057,10 @@
       updateGoogleMapEmbed(placeInput.value);
     }
 
-    async function fetchFromGoogleSheetsDirect() {
-      const endpoints = [
-        `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&t=${Date.now()}`,
-        `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=${encodeURIComponent('Training Course')}&tqx=out:json&t=${Date.now()}`,
-        `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json&t=${Date.now()}`
-      ];
-      for (const url of endpoints) {
-        try {
-          const res = await fetch(url);
-          if (!res.ok) continue;
-          const text = await res.text();
-          const jsonMatch = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/);
-          if (!jsonMatch || !jsonMatch[1]) continue;
-          const data = JSON.parse(jsonMatch[1]);
-          if (!data.table || !data.table.rows || data.table.rows.length === 0) continue;
-          const courses = [];
-          const rows = data.table.rows.map(r => (r.c || []).map(cell => (cell && cell.v !== null && cell.v !== undefined) ? cell.v : ''));
-          const startIdx = (rows.length > 0 && String(rows[0][1]).trim() === 'Topic') ? 1 : 0;
-          for (let i = startIdx; i < rows.length; i++) {
-            const row = rows[i];
-            if (!row || !row[1] || String(row[1]).trim() === '' || String(row[1]).trim() === 'Topic') continue;
-            const rawMaterials = String(row[7] || '');
-            const materialLinks = rawMaterials
-              .split(/[\n,]+/)
-              .map(s => s.trim())
-              .filter(s => s.startsWith('http://') || s.startsWith('https://'));
-            courses.push({
-              rowId: null,
-              saveRequestId: String(row[14] || '').trim(),
-              timestamp: row[0] || '',
-              topic: String(row[1] || '').trim(),
-              target: String(row[2] || 'ครูและบุคลากรทางการศึกษา').trim(),
-              date: String(row[3] || '-').trim(),
-              type: String(row[4] || 'online').toLowerCase().trim(),
-              place: String(row[5] || 'ออนไลน์ (Online)').trim(),
-              status: String(row[6] || 'เปิดการอบรม').trim(),
-              linkMaterials: materialLinks,
-              linkMaterialsRaw: rawMaterials,
-              linkRegistration: String(row[8] || '').trim(),
-              linkName: String(row[9] || '').trim(),
-              linkCertificated: String(row[10] || '').trim(),
-              linkRecheck: String(row[11] || '').trim(),
-              linkPadletSummary: String(row[12] || '').trim(),
-              linkTranscriptSummary: String(row[13] || '').trim()
-            });
-          }
-          if (courses.length > 0) {
-            return { success: true, courses: courses };
-          }
-        } catch (e) {
-          console.warn('Fetch fallback endpoint warning:', url, e);
-        }
-      }
-      return null;
-    }
-
     async function fetchData() {
-      document.querySelectorAll('#headerRefreshBtn i, #bannerRefreshBtn i').forEach(icon => {
-        icon.classList.add('fa-spin');
-      });
       document.getElementById('loading').classList.remove('hidden');
-      document.getElementById('contentArea').classList.add('hidden');
-      
-      const onFetchComplete = () => {
-        document.querySelectorAll('#headerRefreshBtn i, #bannerRefreshBtn i').forEach(icon => {
-          icon.classList.remove('fa-spin');
-        });
-      };
-
-      if (isGasEnvironment()) {
-        google.script.run
-          .withSuccessHandler(async (res) => {
-            if (res && res.success && res.courses && res.courses.length > 0) {
-              onFetchComplete();
-              renderData(res);
-            } else {
-              const fallback = await fetchFromGoogleSheetsDirect();
-              onFetchComplete();
-              if (fallback && fallback.courses && fallback.courses.length > 0) {
-                renderData(fallback);
-              } else {
-                renderData(res || { success: true, courses: [] });
-              }
-            }
-          })
-          .withFailureHandler(async (err) => {
-            const fallback = await fetchFromGoogleSheetsDirect();
-            onFetchComplete();
-            if (fallback && fallback.courses && fallback.courses.length > 0) {
-              renderData(fallback);
-            } else {
-              document.getElementById('loading').classList.add('hidden');
-              document.getElementById('contentArea').classList.remove('hidden');
-              Swal.fire({ icon: 'error', title: 'เชื่อมต่อล้มเหลว', text: err.message || err.toString() });
-            }
-          })
-          .getTrainingPortalData();
-      } else {
-        try {
-          const fetchUrl = gasApiUrl + (gasApiUrl.includes('?') ? '&' : '?') + 'action=getData&t=' + Date.now();
-          const response = await fetch(fetchUrl);
-          const data = await response.json();
-          if (!response.ok || !data.success || !Array.isArray(data.courses)) throw new Error('API unavailable');
-          onFetchComplete();
-          renderData(data);
-        } catch (err) {
-          const fallback = await fetchFromGoogleSheetsDirect();
-          onFetchComplete();
-          renderData(fallback || {success:false, message:'ไม่สามารถโหลดข้อมูลหลักสูตรได้'});
-        }
-      }
+      try { const res = isGasEnvironment() ? await new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getTrainingPortalData()) : await (await fetch(gasApiUrl+'?action=getData&t='+Date.now())).json(); renderData(res); }
+      catch(e){renderData({success:false,message:'เชื่อมต่อ API ไม่สำเร็จ กรุณาตรวจสอบ Deployment'});}
     }
 
     function renderData(res) {
@@ -1177,6 +1071,7 @@
       }
       document.getElementById('contentArea').classList.remove('hidden');
       allCoursesData = res.courses || [];
+      updateYears();
       
       const openCount = allCoursesData.filter(c => c.status === 'เปิดการอบรม' || c.status === 'open').length;
       const completedCount = allCoursesData.length - openCount;
@@ -1207,9 +1102,12 @@
       document.getElementById('courseSearchInput').value = '';
       document.getElementById('typeFilter').value = 'all';
       document.getElementById('statusFilter').value = 'all';
+      document.getElementById('yearFilter').value = 'all';
       filterCourses();
     }
 
+    function courseYear(c){const t=parseThaiDateToTimestamp(c.date);if(!t)return '';const d=new Date(t);const m=d.getMonth()+1;const mode=document.getElementById('yearMode').value;return String(d.getFullYear()+543+(mode==='fiscal'&&m>=10?1:mode==='academic'&&m<5?-1:0));}
+    function updateYears(){const el=document.getElementById('yearFilter'),prev=el.value;el.replaceChildren(new Option('ทุกปี','all'));[...new Set(allCoursesData.map(courseYear).filter(Boolean))].sort().reverse().forEach(y=>el.add(new Option(y,y)));el.value=[...el.options].some(o=>o.value===prev)?prev:'all';}
     function filterCourses(keepPage = false) {
       const search = (document.getElementById('courseSearchInput').value || '').toLowerCase().trim();
       const typeFilter = document.getElementById('typeFilter').value;
@@ -1228,7 +1126,7 @@
         } else if (statusFilter === 'completed') {
           matchStatus = (c.status === 'อบรมเสร็จแล้ว' || c.status === 'closed' || c.status === 'close' || c.status === 'completed');
         }
-        return matchSearch && matchType && matchStatus;
+        return matchSearch && matchType && matchStatus && (document.getElementById('yearFilter').value==='all'||courseYear(c)===document.getElementById('yearFilter').value);
       });
 
       currentFilteredCourses.sort((a, b) => {
@@ -1442,9 +1340,9 @@
         if (item.place && item.place !== 'ออนไลน์ (Online)') {
           const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.place)}`;
           placeDisplay = `
-            <a href="${mapUrl}" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-slate-700 hover:text-rose-700 bg-slate-50 hover:bg-rose-50 px-2.5 py-1 rounded-lg border border-slate-200 hover:border-rose-200 transition" title="ดูตำแหน่งบน Google Maps">
+            <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs text-slate-700 hover:text-rose-700 bg-slate-50 hover:bg-rose-50 px-2.5 py-1 rounded-lg border border-slate-200 hover:border-rose-200 transition" title="ดูตำแหน่งบน Google Maps">
               <i class="fa-solid fa-location-dot text-rose-600"></i>
-              <span class="font-medium">${item.place}</span>
+              <span class="font-medium">${escapeHtml(item.place)}</span>
               <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-400"></i>
             </a>`;
         } else {
@@ -1454,21 +1352,13 @@
             </span>`;
         }
 
-        const sanitizeUrl = (url) => {
-          if (!url) return '';
-          let u = String(url).trim();
-          if (!u || u === '-' || u.toLowerCase() === 'none') return '';
-          if (!u.startsWith('http://') && !u.startsWith('https://')) {
-            u = 'https://' + u;
-          }
-          return u;
-        };
+        const sanitizeUrl = safeUrl;
 
         // 1. Registration
         const regUrl = sanitizeUrl(item.linkRegistration);
         const hasReg = !!regUrl;
         const regBtn = hasReg
-          ? `<a href="${regUrl}" target="_blank" class="py-2 px-2.5 bg-blue-700 hover:bg-blue-800 text-white rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 shadow-xs">
+          ? `<a href="${regUrl}" target="_blank" rel="noopener noreferrer" class="py-2 px-2.5 bg-blue-700 hover:bg-blue-800 text-white rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 shadow-xs">
               <i class="fa-solid fa-user-plus text-[11px]"></i> สมัครอบรม
             </a>`
           : `<button disabled class="py-2 px-2.5 bg-slate-100 text-slate-400 rounded-xl font-medium text-xs cursor-not-allowed flex items-center justify-center gap-1.5">
@@ -1479,7 +1369,7 @@
         const nameUrl = sanitizeUrl(item.linkName);
         const hasNames = !!nameUrl;
         const nameBtn = hasNames
-          ? `<a href="${nameUrl}" target="_blank" class="py-2 px-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 shadow-xs">
+          ? `<a href="${nameUrl}" target="_blank" rel="noopener noreferrer" class="py-2 px-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 shadow-xs">
               <i class="fa-solid fa-list-check text-[11px]"></i> รายชื่อผู้สมัคร
             </a>`
           : `<button disabled class="py-2 px-2.5 bg-slate-100 text-slate-400 rounded-xl font-medium text-xs cursor-not-allowed flex items-center justify-center gap-1.5">
@@ -1491,7 +1381,7 @@
         const hasMat = matLinks.length > 0;
         let matBtn = '';
         if (hasMat) {
-          matBtn = `<button onclick="openMaterialsPopup('${encodeURIComponent(JSON.stringify(item))}')" class="py-2 px-2.5 bg-purple-700 hover:bg-purple-800 text-white rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 shadow-xs">
+          matBtn = `<button onclick="openMaterialsPopup('${encodeItem(item)}')" class="py-2 px-2.5 bg-purple-700 hover:bg-purple-800 text-white rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 shadow-xs">
             <i class="fa-solid fa-file-lines text-[11px]"></i> เอกสารประกอบ ${matLinks.length > 1 ? `(${matLinks.length})` : ''}
           </button>`;
         } else {
@@ -1504,7 +1394,7 @@
         const recheckUrl = sanitizeUrl(item.linkRecheck);
         const hasRecheck = !!recheckUrl;
         const recheckBtn = hasRecheck
-          ? `<a href="${recheckUrl}" target="_blank" class="py-2 px-2.5 bg-teal-700 hover:bg-teal-800 text-white rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 shadow-xs" title="คลิกเพื่อตรวจสอบความถูกต้องของรายชื่อ">
+          ? `<a href="${recheckUrl}" target="_blank" rel="noopener noreferrer" class="py-2 px-2.5 bg-teal-700 hover:bg-teal-800 text-white rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 shadow-xs" title="คลิกเพื่อตรวจสอบความถูกต้องของรายชื่อ">
               <i class="fa-solid fa-user-check text-[11px]"></i> ตรวจความถูกต้อง
             </a>`
           : `<button disabled class="py-2 px-2.5 bg-slate-100 text-slate-400 rounded-xl font-medium text-xs cursor-not-allowed flex items-center justify-center gap-1.5" title="ไม่มีลิงก์ตรวจสอบความถูกต้อง">
@@ -1515,7 +1405,7 @@
         const certUrl = sanitizeUrl(item.linkCertificated);
         const hasCert = !!certUrl;
         const certBtn = hasCert
-          ? `<a href="${certUrl}" target="_blank" class="py-2 px-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 shadow-xs">
+          ? `<a href="${certUrl}" target="_blank" rel="noopener noreferrer" class="py-2 px-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-semibold text-xs transition flex items-center justify-center gap-1.5 shadow-xs">
               <i class="fa-solid fa-award text-[11px]"></i> รับเกียรติบัตร
             </a>`
           : `<button disabled class="py-2 px-2.5 bg-slate-100 text-slate-400 rounded-xl font-medium text-xs cursor-not-allowed flex items-center justify-center gap-1.5" title="ไม่มีเกียรติบัตรสำหรับหลักสูตรนี้">
@@ -1531,7 +1421,7 @@
 
         if (hasPadlet || hasTranscript) {
           const padletBadge = hasPadlet
-            ? `<a href="${padletUrl}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 transition shadow-2xs group" title="เปิดดูสรุปความคิดเห็นของเพื่อนครูจาก Padlet">
+            ? `<a href="${padletUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 transition shadow-2xs group" title="เปิดดูสรุปความคิดเห็นของเพื่อนครูจาก Padlet">
                 <i class="fa-solid fa-comments text-rose-600"></i>
                 <span>สรุปความคิดเห็น (Padlet)</span>
                 <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-rose-400 group-hover:text-rose-700"></i>
@@ -1539,7 +1429,7 @@
             : '';
 
           const transcriptBadge = hasTranscript
-            ? `<a href="${transcriptUrl}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 transition shadow-2xs group" title="เปิดดูการถอดเทปและสรุปภาพรวมการอบรม">
+            ? `<a href="${transcriptUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 transition shadow-2xs group" title="เปิดดูการถอดเทปและสรุปภาพรวมการอบรม">
                 <i class="fa-solid fa-microphone-lines text-indigo-600"></i>
                 <span>ถอดเทปสรุปภาพรวม</span>
                 <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-indigo-400 group-hover:text-indigo-700"></i>
@@ -1564,12 +1454,14 @@
         if (currentAdminPin) {
           adminActionTools = `
             <div class="flex items-center justify-between border-t border-slate-100 pt-2 text-xs">
-              <span class="text-[11px] text-slate-400">บันทึกเมื่อ: ${item.timestamp || '-'}</span>
+              <span class="text-[11px] text-slate-400">บันทึกเมื่อ: ${escapeHtml(item.timestamp || '-')}</span>
               <div class="flex items-center gap-1.5">
-                <button onclick="editCourseEntry('${encodeURIComponent(JSON.stringify(item))}')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 rounded-lg transition flex items-center gap-1 font-semibold">
+                <button onclick="editCourseEntry('${encodeItem(item)}')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 rounded-lg transition flex items-center gap-1 font-semibold">
                   <i class="fa-solid fa-pen-to-square text-amber-600"></i> แก้ไขหลักสูตร
                 </button>
-                <button onclick="deleteCourseEntry('${encodeURIComponent(item.topic)}')" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg transition flex items-center gap-1 font-medium">
+                <button onclick="duplicateCourse('${encodeItem(item)}')" class="px-2 py-1 bg-indigo-50 text-indigo-800 rounded-lg">ทำสำเนา</button>
+                <button onclick="quickStatus('${encodeItem(item)}')" class="px-2 py-1 bg-blue-50 text-blue-800 rounded-lg">เปลี่ยนสถานะ</button>
+                <button onclick="deleteCourseEntry('${encodeItem(item)}')" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg transition flex items-center gap-1 font-medium">
                   <i class="fa-solid fa-trash text-rose-500"></i> ลบ
                 </button>
               </div>
@@ -1584,18 +1476,18 @@
               ${statusBadge}
               ${typeBadge}
               <span class="text-xs bg-slate-100/90 text-slate-700 font-medium px-2.5 py-0.5 rounded-lg border border-slate-200/80">
-                🎯 ${item.target}
+                🎯 ${escapeHtml(item.target)}
               </span>
             </div>
             <div class="flex items-center gap-2">
               <span class="text-xs text-slate-600 flex items-center gap-1.5 font-medium">
-                <i class="fa-regular fa-calendar-days text-slate-400"></i> ${item.date}
+                <i class="fa-regular fa-calendar-days text-slate-400"></i> ${escapeHtml(item.date)}
               </span>
             </div>
           </div>
           <div>
             <h3 class="text-base sm:text-lg font-bold text-slate-900 leading-snug tracking-tight">
-              ${item.topic}
+              ${escapeHtml(item.topic)}
             </h3>
             <div class="mt-1.5">${placeDisplay}</div>
           </div>
@@ -1615,22 +1507,22 @@
 
     function openMaterialsPopup(encodedJson) {
       const course = JSON.parse(decodeURIComponent(encodedJson));
-      const links = course.linkMaterials || [];
+      const links = (course.linkMaterials || []).filter(x=>safeUrl(x));
       if (links.length === 1) {
-        window.open(links[0], '_blank');
+        window.open(links[0], '_blank','noopener,noreferrer');
         return;
       }
       let html = `
         <div class="text-left space-y-2.5 pt-2">
-          <p class="text-xs text-slate-600 font-medium">หลักสูตร: <strong>${course.topic}</strong></p>
+          <p class="text-xs text-slate-600 font-medium">หลักสูตร: <strong>${escapeHtml(course.topic)}</strong></p>
           <div class="space-y-2">`;
       
       links.forEach((url, idx) => {
         html += `
-          <a href="${url}" target="_blank" class="flex items-center justify-between p-3 bg-purple-50 hover:bg-purple-100/70 border border-purple-200 rounded-xl transition text-left text-xs text-purple-950 font-semibold group">
+          <a href="${safeUrl(url)}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between p-3 bg-purple-50 hover:bg-purple-100/70 border border-purple-200 rounded-xl transition text-left text-xs text-purple-950 font-semibold group">
             <span class="flex items-center gap-2">
               <span class="w-6 h-6 rounded-lg bg-purple-200 text-purple-900 flex items-center justify-center font-bold text-[11px]">${idx + 1}</span>
-              <span class="truncate max-w-[280px]">${url}</span>
+              <span class="truncate max-w-[280px]">${escapeHtml(url)}</span>
             </span>
             <i class="fa-solid fa-arrow-up-right-from-square text-purple-400 group-hover:text-purple-700"></i>
           </a>`;
@@ -1644,74 +1536,28 @@
       });
     }
 
-    function openAdminModal() {
-      if (currentAdminPin) {
-        Swal.fire({
-          title: 'ออกจากระบบ?',
-          text: 'ต้องการออกจากโหมดผู้ดูแลระบบใช่หรือไม่',
-          icon: 'question',
-          showCancelButton: true,
-          confirmButtonText: 'ออกจากระบบ',
-          cancelButtonText: 'ยกเลิก',
-          confirmButtonColor: '#0f172a'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            currentAdminPin = null;
-            document.getElementById('adminStatusBar').classList.add('hidden');
-            document.getElementById('adminBtnLabel').innerText = 'ผู้ดูแลระบบ';
-            filterCourses(true);
-          }
-        });
-        return;
-      }
-      Swal.fire({
-        title: 'ยืนยันสิทธิ์ผู้ดูแลระบบ',
-        input: 'password',
-        inputLabel: 'กรุณากรอกรหัสผ่านเพื่อจัดการข้อมูล',
-        inputPlaceholder: 'ใส่รหัสผ่านผู้ดูแลระบบ',
-        showCancelButton: true,
-        confirmButtonText: 'เข้าสู่ระบบ',
-        cancelButtonText: 'ยกเลิก',
-        confirmButtonColor: '#0f172a',
-        showLoaderOnConfirm: true,
-        preConfirm: (pin) => {
-          if (isGasEnvironment()) {
-            return new Promise((resolve) => {
-              google.script.run.withSuccessHandler((res) => {
-                if (res.success) {
-                  currentAdminPin = pin;
-                  resolve(true);
-                } else {
-                  Swal.showValidationMessage('รหัสผ่านไม่ถูกต้อง');
-                  resolve(false);
-                }
-              }).verifyAdminPin(pin);
-            });
-          } else {
-            if (pin.trim() === '254782115') {
-              currentAdminPin = pin;
-              return true;
-            } else {
-              Swal.showValidationMessage('รหัสผ่านไม่ถูกต้อง');
-              return false;
-            }
-          }
-        }
-      }).then((result) => {
-        if (result.isConfirmed && currentAdminPin) {
-          document.getElementById('adminStatusBar').classList.remove('hidden');
-          document.getElementById('adminBtnLabel').innerText = 'ออกจากระบบ';
-          filterCourses(true);
-          Swal.fire({
-            icon: 'success',
-            title: 'ยินดีต้อนรับ ศน.รัชภูมิ',
-            text: 'เข้าสู่โหมดจัดการข้อมูลเรียบร้อยแล้ว',
-            timer: 1500,
-            showConfirmButton: false
-          });
-        }
-      });
+    async function adminApi(payload){
+      if(payload.action!=='login')payload.token=currentAdminPin;
+      if(isGasEnvironment())return new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).adminAction(payload));
+      if(!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(gasApiUrl))throw Error('API URL ไม่ถูกต้อง');
+      const res=await fetch(gasApiUrl,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});if(!res.ok)throw Error('HTTP '+res.status);return res.json();
     }
+    function logoutUI(){currentAdminPin=null;document.getElementById('adminStatusBar').classList.add('hidden');document.getElementById('adminBtnLabel').innerText='ผู้ดูแลระบบ';filterCourses(true);}
+    async function openAdminModal(){
+      if(currentAdminPin){try{await adminApi({action:'logout'});}catch(e){}logoutUI();return;}
+      const result=await Swal.fire({title:'เข้าสู่ระบบผู้ดูแล',input:'password',showCancelButton:true,confirmButtonText:'เข้าสู่ระบบ',showLoaderOnConfirm:true,preConfirm:async password=>{try{const r=await adminApi({action:'login',password});if(!r.success)throw Error(r.message);return r.token;}catch(e){Swal.showValidationMessage(escapeHtml(e.message));return false;}}});
+      if(result.isConfirmed&&result.value){currentAdminPin=result.value;document.getElementById('adminStatusBar').classList.remove('hidden');document.getElementById('adminBtnLabel').innerText='ออกจากระบบ';await fetchData();}
+    }
+    function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+    function safeUrl(v){try{const u=new URL(String(v));return ['http:','https:'].includes(u.protocol)?escapeHtml(u.href):'';}catch(e){return '';}}
+    function encodeItem(v){return encodeURIComponent(JSON.stringify(v)).replace(/'/g,'%27');}
+    function newRequest(){return crypto.randomUUID ? crypto.randomUUID():Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,'0')).join('');}
+    async function adminMutation(action,c,status){if(!currentAdminPin||!c.courseId)return;try{const r=await adminApi({action,courseId:c.courseId,originalRequestId:c.saveRequestId||'',requestId:newRequest(),status});if(!r.success)throw Error(r.message);await fetchData();Swal.fire({icon:'success',title:'สำเร็จ',text:r.message});}catch(e){Swal.fire({icon:'error',title:'ไม่ยืนยันผล',text:e.message+' กรุณารีเฟรชเพื่อตรวจสอบ'});}}
+    function duplicateCourse(encoded){editCourseEntry(encoded);editIdentity=null;document.getElementById('formRowId').value='';document.getElementById('formOriginalTopic').value='';document.getElementById('formTopic').value+=' (สำเนา)';document.getElementById('modalFormTitle').innerText='ทำสำเนาหลักสูตรใหม่ — ตรวจสอบวันและลิงก์ก่อนบันทึก';}
+    async function quickStatus(encoded){const c=JSON.parse(decodeURIComponent(encoded));const status=['open','เปิดการอบรม'].includes(c.status)?'อบรมเสร็จแล้ว':'เปิดการอบรม';const q=await Swal.fire({title:'เปลี่ยนสถานะ?',text:c.topic+' → '+status,showCancelButton:true});if(q.isConfirmed)adminMutation('quickStatus',c,status);}
+    async function openTrash(){try{const r=await adminApi({action:'trash'});if(!r.success)throw Error(r.message);if(!r.courses.length){Swal.fire('ถังขยะว่าง');return;}const q=await Swal.fire({title:'ถังขยะ — เลือกเพื่อกู้คืน',input:'select',inputOptions:Object.fromEntries(r.courses.map((c,i)=>[i,c.topic+' ('+c.deletedAt+')'])),showCancelButton:true,confirmButtonText:'กู้คืน'});if(q.isConfirmed)await adminMutation('restore',r.courses[Number(q.value)]);}catch(e){Swal.fire({icon:'error',text:e.message});}}
+    async function openAudit(){try{const r=await adminApi({action:'audit'});if(!r.success)throw Error(r.message);Swal.fire({title:'ประวัติ 100 รายการล่าสุด',width:850,html:'<div class="text-left overflow-auto max-h-96">'+r.entries.map(x=>'<p class="border-b py-2 text-xs">'+x.map(escapeHtml).join(' · ')+'</p>').join('')+'</div>'});}catch(e){Swal.fire({icon:'error',text:e.message});}}
+
 
     let saveInProgress = false;
     let pendingSave = null;
@@ -1788,7 +1634,7 @@
       if (saveInProgress) return;
       pendingSave = null;
       const course = JSON.parse(decodeURIComponent(encodedJson));
-      editIdentity = {topic: course.topic, requestId: course.saveRequestId || ""};
+      editIdentity = {topic: course.topic, requestId: course.saveRequestId || "", courseId:course.courseId};
       document.getElementById('courseForm').reset();
       document.getElementById('formRowId').value = course.rowId || '';
       document.getElementById('formOriginalTopic').value = course.topic || '';
@@ -1863,7 +1709,7 @@
       if (!finalPlace) {
         finalPlace = (typeVal === 'online') ? 'ออนไลน์ (Online)' : 'สำนักงานศึกษาธิการจังหวัดเชียงใหม่';
       }
-      const finalPin = currentAdminPin || '254782115';
+      if (!currentAdminPin) return;
       
       const finalRegLink = isRegistrationEnabled ? document.getElementById('formLinkRegistration').value.trim() : '';
       const finalNameLink = isNameEnabled ? document.getElementById('formLinkName').value.trim() : '';
@@ -1876,10 +1722,9 @@
 
       const payload = {
         action: 'saveEntry',
-        operation: document.getElementById('formOriginalTopic').value.trim() ? 'update' : 'create',
+        operation: editIdentity ? 'update' : 'create',
         originalRequestId: editIdentity ? editIdentity.requestId : '',
-        adminPin: finalPin,
-        pin: finalPin,
+        courseId: editIdentity ? editIdentity.courseId : "",
         rowId: document.getElementById('formRowId').value,
         originalTopic: document.getElementById('formOriginalTopic').value,
         topic: document.getElementById('formTopic').value,
@@ -1931,6 +1776,7 @@
           Swal.fire({ icon: 'success', title: 'สำเร็จ', text: res.message, confirmButtonColor: '#0f172a' });
           fetchData();
         } else {
+          pendingSave = null;
           Swal.fire({ icon: 'error', title: 'ยังไม่ยืนยันการบันทึก', text: (res && res.message || 'ไม่พบผลตอบกลับจากระบบ') + ' กรุณาตรวจสอบข้อมูลก่อนเริ่มรายการใหม่' });
         }
       }
@@ -1938,59 +1784,11 @@
         unlockSave();
         Swal.fire({ icon: 'warning', title: 'ยังไม่สามารถยืนยันผลบันทึก', text: 'คำขออาจบันทึกสำเร็จแล้ว กรุณาตรวจสอบ Google Sheet หรือกดบันทึกซ้ำโดยไม่แก้ไขข้อมูล ระบบจะใช้รหัสคำขอเดิม' });
       }
-      if (isGasEnvironment()) {
-        google.script.run.withSuccessHandler(onSaveResult).withFailureHandler(onSaveFailure).saveAdminEntry(payload);
-      } else {
-        // Never issue a second write through GET/no-cors after POST.
-        fetch(gasApiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload)
-        }).then(res => {
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-          return res.json();
-        }).then(onSaveResult).catch(onSaveFailure);
-      }
+      adminApi(payload).then(onSaveResult).catch(onSaveFailure);
     }
 
-    function deleteCourseEntry(encodedTopic) {
-      const topic = decodeURIComponent(encodedTopic);
-      Swal.fire({
-        title: 'ยืนยันการลบ?',
-        text: `ต้องการลบหลักสูตร "${topic}" ออกจากระบบใช่หรือไม่`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'ลบข้อมูล',
-        cancelButtonText: 'ยกเลิก',
-        confirmButtonColor: '#e11d48'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          const finalPin = currentAdminPin || '254782115';
-          const payload = { action: 'deleteEntry', adminPin: finalPin, pin: finalPin, topic: topic };
-          if (isGasEnvironment()) {
-            google.script.run
-              .withSuccessHandler((res) => {
-                if (res.success) {
-                  Swal.fire({ icon: 'success', title: 'ลบสำเร็จ', text: res.message, timer: 1200, showConfirmButton: false });
-                  fetchData();
-                } else {
-                  Swal.fire({ icon: 'error', title: 'ลบล้มเหลว', text: res.message });
-                }
-              })
-              .deleteAdminEntry(payload);
-          } else {
-            fetch(gasApiUrl, {
-              method: 'POST',
-              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-              body: JSON.stringify(payload)
-            }).then(() => {
-              Swal.fire({ icon: 'success', title: 'ลบสำเร็จ', text: 'ส่งคำสั่งลบไปยัง Google Sheet เรียบร้อยแล้ว', timer: 1200, showConfirmButton: false });
-              setTimeout(fetchData, 1500);
-            });
-          }
-        }
-      });
-    }
+    async function deleteCourseEntry(encoded){const c=JSON.parse(decodeURIComponent(encoded));const r=await Swal.fire({title:'ย้ายลงถังขยะ?',text:c.topic,showCancelButton:true,confirmButtonText:'ย้ายลงถังขยะ'});if(r.isConfirmed)await adminMutation('deleteEntry',c);}
+
 
     function openApiConfigModal() {
       Swal.fire({
@@ -2005,6 +1803,7 @@
         confirmButtonColor: '#0f172a'
       }).then((result) => {
         if (result.isConfirmed && result.value) {
+          if(currentAdminPin){try{adminApi({action:'logout'});}catch(e){}logoutUI();}
           gasApiUrl = result.value.trim();
           localStorage.setItem('TRAINING_GAS_API_URL', gasApiUrl);
           Swal.fire({ icon: 'success', title: 'บันทึก URL สำเร็จ', timer: 1200, showConfirmButton: false });
