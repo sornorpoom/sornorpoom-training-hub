@@ -43,7 +43,7 @@
       transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    /* 🎓 Bright & Vibrant Academic Themes (No dark/black backgrounds) */
+    /* 🎓 Bright & Vibrant Academic Themes */
     body.theme-academic { 
       background-color: #f0f6ff; 
       color: #0f172a; 
@@ -100,7 +100,7 @@
       box-shadow: 0 12px 24px -8px rgba(15, 23, 42, 0.09);
     }
 
-    /* 🎨 Course Cards Background: Active (Rich/Vibrant) vs Completed (Soft/Pale) with Alternating Shades */
+    /* 🎨 Course Cards Background */
     .course-card-open-0 {
       background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%) !important;
       border-color: #93c5fd !important;
@@ -126,30 +126,13 @@
       opacity: 0.85;
     }
 
-    body.theme-forest .course-card-open-0 {
-      background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%) !important;
-      border-color: #6ee7b7 !important;
-      border-left: 4px solid #059669 !important;
-      box-shadow: 0 4px 14px -3px rgba(5, 150, 105, 0.12) !important;
+    /* ✨ Animated New Badge Micro-effects */
+    @keyframes pulseSoft {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
     }
-    body.theme-forest .course-card-open-1 {
-      background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%) !important;
-      border-color: #86efac !important;
-      border-left: 4px solid #16a34a !important;
-      box-shadow: 0 4px 14px -3px rgba(22, 163, 74, 0.12) !important;
-    }
-
-    body.theme-warm .course-card-open-0 {
-      background: linear-gradient(135deg, #ffffff 0%, #fff7ed 100%) !important;
-      border-color: #fdba74 !important;
-      border-left: 4px solid #ea580c !important;
-      box-shadow: 0 4px 14px -3px rgba(234, 88, 12, 0.12) !important;
-    }
-    body.theme-warm .course-card-open-1 {
-      background: linear-gradient(135deg, #ffffff 0%, #fef3c7 100%) !important;
-      border-color: #fcd34d !important;
-      border-left: 4px solid #d97706 !important;
-      box-shadow: 0 4px 14px -3px rgba(217, 119, 6, 0.12) !important;
+    .animate-badge-pop {
+      animation: pulseSoft 2s ease-in-out infinite;
     }
 
     /* Custom Scrollbar for Form */
@@ -165,7 +148,7 @@
       border-radius: 9999px;
     }
 
-    /* ✨ Page Transition & Button Micro-Interactions */
+    /* Page Slide Transition */
     @keyframes pageFadeSlide {
       0% {
         opacity: 0;
@@ -176,7 +159,6 @@
         transform: translateY(0) scale(1);
       }
     }
-
     .animate-page-slide {
       animation: pageFadeSlide 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
@@ -193,40 +175,9 @@
     .btn-page-nav:active:not(:disabled) {
       transform: scale(0.96) translateY(0);
     }
-
-    /* 🌟 Vibrant Course Sequence Badge */
-    .badge-seq-vibrant {
-      background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
-      color: #ffffff;
-      font-size: 13px; /* เพิ่มขนาดฟอนต์ 3-5% ให้เด่นชัด */
-      font-weight: 800;
-      letter-spacing: -0.01em;
-      padding: 3.5px 12px;
-      border-radius: 12px;
-      box-shadow: 0 3px 10px -2px rgba(79, 70, 229, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .badge-seq-vibrant:hover {
-      transform: scale(1.04);
-      box-shadow: 0 5px 14px -2px rgba(79, 70, 229, 0.55);
-    }
-    body.theme-forest .badge-seq-vibrant {
-      background: linear-gradient(135deg, #059669 0%, #0d9488 50%, #0284c7 100%);
-      box-shadow: 0 3px 10px -2px rgba(5, 150, 105, 0.45);
-    }
-    body.theme-warm .badge-seq-vibrant {
-      background: linear-gradient(135deg, #ea580c 0%, #d97706 50%, #e11d48 100%);
-      box-shadow: 0 3px 10px -2px rgba(234, 88, 12, 0.45);
-    }
   </style>
 </head>
-
-<body class="theme-academic min-h-screen flex flex-col antialiased selection:bg-slate-800 selection:text-white">
+<body class="theme-academic min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
 
   <!-- ==================== HEADER (Academic Minimal) ==================== -->
   <header class="text-white shadow-lg border-b border-slate-700/50 sticky top-0 z-40 backdrop-blur-md">
@@ -264,7 +215,6 @@
 
         <!-- Right: Controls (Theme, Font, Refresh, Admin) -->
         <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-          
           <!-- Quick Refresh Button in Header -->
           <button onclick="fetchData()" id="headerRefreshBtn" class="px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-medium border border-white/15 transition flex items-center gap-1.5 active:scale-95" title="รีเฟรชข้อมูลจาก Google Sheet">
             <i class="fa-solid fa-rotate text-xs"></i>
@@ -296,7 +246,7 @@
     </div>
   </header>
 
-  <!-- ==================== ADMIN ACTION BAR (Shown when Logged In) ==================== -->
+  <!-- ==================== ADMIN ACTION BAR ==================== -->
   <div id="adminStatusBar" class="hidden bg-slate-900 text-white border-b border-slate-800 shadow-md">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
       <div class="flex items-center gap-2">
@@ -323,7 +273,7 @@
 
   <!-- ==================== MAIN CONTENT ==================== -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
-
+    
     <!-- Loading Spinner -->
     <div id="loading" class="py-20 text-center space-y-3">
       <div class="inline-block w-9 h-9 border-3 border-slate-300 border-t-slate-800 rounded-full animate-spin"></div>
@@ -332,33 +282,26 @@
 
     <!-- Content Area -->
     <div id="contentArea" class="hidden space-y-6">
-
-      <!-- ==================== HEADER SUMMARY BANNER (With Refresh & Course Count Buttons) ==================== -->
+      
+      <!-- HEADER SUMMARY BANNER -->
       <div class="card-academic rounded-3xl p-5 sm:p-6 border shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div class="space-y-1.5 flex-1">
           <div class="flex items-center gap-2 flex-wrap">
-            
-            <!-- 📊 ปุ่มแสดงจำนวนหลักสูตร (Interactive Course Count Button) -->
             <button onclick="resetCourseFilters()" id="btnCourseCountBadge" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white border border-blue-400/50 transition flex items-center gap-1.5 shadow-sm active:scale-95" title="คลิกเพื่อแสดงหลักสูตรทั้งหมด">
               <i class="fa-solid fa-layer-group text-amber-300"></i>
               <span id="statCourseCount">0 หลักสูตร</span>
             </button>
-
-            <!-- Status Breakdown Badges -->
             <span id="statOpenCountBadge" onclick="setQuickStatusFilter('open')" class="cursor-pointer px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition flex items-center gap-1.5 shadow-2xs">
               <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> เปิดอบรม <strong id="statOpenCount">0</strong>
             </span>
             <span id="statCompletedCountBadge" onclick="setQuickStatusFilter('completed')" class="cursor-pointer px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition flex items-center gap-1.5 shadow-2xs">
               <span class="w-2 h-2 rounded-full bg-slate-400"></span> เสร็จสิ้น <strong id="statCompletedCount">0</strong>
             </span>
-
-            <!-- 🔄 ปุ่มรีเฟรชข้อมูล (Refresh Button) -->
             <button onclick="fetchData()" id="bannerRefreshBtn" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 hover:text-blue-900 transition flex items-center gap-1.5 shadow-2xs active:scale-95" title="ดึงข้อมูลล่าสุดจาก Google Sheet ทันที">
               <i class="fa-solid fa-rotate text-blue-600"></i>
               <span>รีเฟรชข้อมูล</span>
             </button>
           </div>
-
           <h2 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight pt-1">
             ทะเบียนหลักสูตรการอบรม (Training Courses)
           </h2>
@@ -368,18 +311,13 @@
         </div>
       </div>
 
-      <!-- ==================== SEARCH & FILTERS BAR ==================== -->
+      <!-- SEARCH & FILTERS BAR -->
       <div class="card-academic rounded-2xl p-4 border shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-        
-        <!-- Search Input -->
         <div class="relative flex-1 max-w-md">
-          <input type="text" id="courseSearchInput" oninput="filterCourses()" placeholder="ค้นหาชื่อหลักสูตร, กลุ่มเป้าหมาย, หรือสถานที่..." class="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-slate-800 focus:bg-white transition">
+          <input type="text" id="courseSearchInput" oninput="filterCourses()" placeholder="ค้นหาชื่อหลักสูตร, กลุ่มเป้าหมาย, หรือสถานที่..." class="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
         </div>
-
-        <!-- Filter Dropdowns & Controls -->
         <div class="flex items-center gap-2 flex-wrap text-xs">
-          <!-- Type Filter -->
           <div class="flex items-center gap-1 bg-slate-50 px-2 py-1 rounded-xl border border-slate-200">
             <span class="text-slate-400 text-[11px]">รูปแบบ:</span>
             <select id="typeFilter" onchange="filterCourses()" class="bg-transparent font-medium text-slate-700 outline-none cursor-pointer">
@@ -389,8 +327,6 @@
               <option value="hybrid">Hybrid</option>
             </select>
           </div>
-
-          <!-- Status Filter -->
           <div class="flex items-center gap-1 bg-slate-50 px-2 py-1 rounded-xl border border-slate-200">
             <span class="text-slate-400 text-[11px]">สถานะ:</span>
             <select id="statusFilter" onchange="filterCourses()" class="bg-transparent font-medium text-slate-700 outline-none cursor-pointer">
@@ -399,22 +335,17 @@
               <option value="completed">อบรมเสร็จแล้ว</option>
             </select>
           </div>
-
-          <!-- Sort Order -->
           <button onclick="toggleSortOrder()" id="sortOrderBtn" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium transition flex items-center gap-1.5 border border-slate-200" title="สลับลำดับการเรียง">
             <i class="fa-solid fa-arrow-down-wide-short"></i>
             <span id="sortOrderLabel">เรียงวันที่ (ล่าสุดก่อน)</span>
           </button>
-
-          <!-- Refresh Button in Filter Bar -->
           <button onclick="fetchData()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium transition flex items-center gap-1 border border-slate-200" title="รีเฟรชข้อมูล">
             <i class="fa-solid fa-rotate"></i>
           </button>
         </div>
-
       </div>
 
-      <!-- ==================== COURSE PAGE SUMMARY INDICATOR BANNER ==================== -->
+      <!-- COURSE PAGE SUMMARY INDICATOR BANNER -->
       <div id="pageSummaryBanner" class="hidden card-academic flex-wrap items-center justify-between gap-2.5 px-4 py-3 rounded-2xl border text-xs bg-white/95 backdrop-blur-xs shadow-2xs">
         <div class="flex items-center gap-2 flex-wrap text-slate-700">
           <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-blue-50 text-blue-800 font-bold border border-blue-200/80 shadow-2xs">
@@ -432,10 +363,10 @@
         </div>
       </div>
 
-      <!-- ==================== COURSE CARDS LIST CONTAINER ==================== -->
+      <!-- COURSE CARDS LIST CONTAINER -->
       <div id="courseList" class="space-y-4"></div>
 
-      <!-- ==================== PAGINATION CONTROLS (5 COURSES PER PAGE) ==================== -->
+      <!-- PAGINATION CONTROLS -->
       <div id="paginationContainer" class="hidden pt-6 pb-2 flex flex-col sm:flex-row items-center justify-between gap-3.5 border-t border-slate-200/80">
         <div class="text-xs text-slate-600 font-medium flex items-center gap-2 flex-wrap">
           <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-100 text-slate-800 font-bold border border-slate-200 shadow-2xs">
@@ -446,18 +377,12 @@
             Showing items <strong id="pageRangeText" class="font-bold text-slate-900">1 - 5</strong> of <strong id="totalCoursesText" class="font-bold text-slate-900">0</strong> courses total
           </span>
         </div>
-
         <div class="flex items-center gap-2 flex-wrap">
-          <!-- Previous Button (English with Motion) -->
           <button type="button" id="prevPageBtn" onclick="goToPreviousPage()" class="btn-page-nav px-4 py-2 rounded-xl border border-slate-300/90 bg-white hover:bg-slate-900 hover:text-white text-slate-700 font-bold text-xs transition-all duration-200 flex items-center gap-2 shadow-2xs disabled:opacity-30 disabled:pointer-events-none active:scale-95 group" title="Go to Previous Page (ย้อนกลับ)">
             <i class="fa-solid fa-chevron-left text-[10px] transition-transform group-hover:-translate-x-1 duration-200"></i>
             <span>Previous</span>
           </button>
-
-          <!-- Numbered Page Pills -->
           <div id="pageNumberButtons" class="flex items-center gap-1.5"></div>
-
-          <!-- Next Button (English with Motion) -->
           <button type="button" id="nextPageBtn" onclick="goToNextPage()" class="btn-page-nav px-4 py-2 rounded-xl border border-slate-300/90 bg-white hover:bg-slate-900 hover:text-white text-slate-700 font-bold text-xs transition-all duration-200 flex items-center gap-2 shadow-2xs disabled:opacity-30 disabled:pointer-events-none active:scale-95 group" title="Go to Next Page (หน้าถัดไป)">
             <span>Next</span>
             <i class="fa-solid fa-chevron-right text-[10px] transition-transform group-hover:translate-x-1 duration-200"></i>
@@ -466,7 +391,6 @@
       </div>
 
     </div>
-
   </main>
 
   <!-- ==================== FOOTER ==================== -->
@@ -507,7 +431,6 @@
 
       <!-- FORM IN WIDE HORIZONTAL LAYOUT -->
       <form id="courseForm" onsubmit="handleFormSubmit(event)" class="space-y-4 text-xs sm:text-sm">
-        
         <input type="hidden" id="formRowId" value="">
         <input type="hidden" id="formOriginalTopic" value="">
 
@@ -520,34 +443,28 @@
               <i class="fa-solid fa-circle-info text-slate-600"></i> ข้อมูลหลักสูตร (General Info)
             </h4>
 
-            <!-- Topic -->
             <div>
               <label class="block font-semibold mb-1 text-slate-800">
                 1. ชื่อหลักสูตร / กิจกรรม (Topic) <span class="text-rose-500">*</span>
               </label>
-              <input type="text" id="formTopic" required placeholder="ระบุชื่อหลักสูตร เช่น การพัฒนาสมรรถนะครูด้านการจัดการเรียนรู้เชิงรุก (Active Learning)" class="w-full px-3 py-2 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-slate-800 bg-white font-medium transition">
+              <input type="text" id="formTopic" required placeholder="ระบุชื่อหลักสูตร..." class="w-full px-3 py-2 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 bg-white font-medium transition">
             </div>
 
-            <!-- Target -->
             <div>
               <label class="block font-semibold mb-1 text-slate-800">
                 2. กลุ่มเป้าหมาย (Target) <span class="text-rose-500">*</span>
               </label>
-              <input type="text" id="formTarget" required placeholder="เช่น ครูผู้สอนสังกัด สพฐ., ผู้บริหารสถานศึกษา, บุคลากรทางการศึกษา..." class="w-full px-3 py-2 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-slate-800 bg-white transition">
+              <input type="text" id="formTarget" required placeholder="เช่น ครูผู้สอนสังกัด สพฐ., ผู้บริหารสถานศึกษา..." class="w-full px-3 py-2 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 bg-white transition">
             </div>
 
-            <!-- Date & Time Row -->
             <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
-              <!-- Date Picker -->
               <div class="sm:col-span-6">
                 <label class="block font-semibold mb-1 flex items-center justify-between text-slate-800">
                   <span>3. วัน เดือน ปี (Date) <span class="text-rose-500">*</span></span>
                   <span id="datePreviewLabel" class="text-slate-500 font-normal text-[10px]"></span>
                 </label>
-                <input type="date" id="formDatePicker" required onchange="updateDatePreview()" class="w-full px-3 py-2 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-slate-800 bg-white cursor-pointer">
+                <input type="date" id="formDatePicker" required onchange="updateDatePreview()" class="w-full px-3 py-2 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 bg-white cursor-pointer">
               </div>
-
-              <!-- Start & End Time -->
               <div class="sm:col-span-6 grid grid-cols-2 gap-2">
                 <div>
                   <label class="block font-semibold mb-1 text-slate-800 text-xs">เวลาเริ่ม</label>
@@ -560,7 +477,6 @@
               </div>
             </div>
 
-            <!-- Type & Status Row -->
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block font-semibold mb-1 text-slate-800">4. รูปแบบ (Type) <span class="text-rose-500">*</span></label>
@@ -578,7 +494,6 @@
                 </select>
               </div>
             </div>
-
           </div>
 
           <!-- RIGHT COLUMN: Place & Live Google Map Embed (5 cols) -->
@@ -588,10 +503,9 @@
                 <span class="flex items-center gap-1.5"><i class="fa-solid fa-map-location-dot text-rose-600"></i> 6. สถานที่ (Place / Google Map)</span>
                 <span class="text-[10px] text-slate-500 font-normal">ค้นหาบนแผนที่</span>
               </label>
-
-              <!-- Search Bar -->
+              
               <div class="flex gap-1.5">
-                <input type="text" id="formPlace" oninput="debounceUpdateMap(this.value)" value="ออนไลน์ (Online)" placeholder="ระบุชื่อสถานที่ เช่น สำนักงานศึกษาธิการจังหวัดเชียงใหม่" class="flex-1 px-3 py-2 border border-slate-300 rounded-xl text-xs bg-white outline-none focus:ring-2 focus:ring-slate-800 transition">
+                <input type="text" id="formPlace" oninput="debounceUpdateMap(this.value)" value="ออนไลน์ (Online)" placeholder="ระบุชื่อสถานที่..." class="flex-1 px-3 py-2 border border-slate-300 rounded-xl text-xs bg-white outline-none focus:ring-2 focus:ring-blue-600 transition">
                 <button type="button" onclick="searchGoogleMap()" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-medium shrink-0 transition flex items-center gap-1 shadow-sm">
                   <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
@@ -600,7 +514,6 @@
                 </a>
               </div>
 
-              <!-- Quick Presets -->
               <div class="flex items-center gap-1 flex-wrap pt-2">
                 <span class="text-[10px] text-slate-400 font-medium">แนะนำ:</span>
                 <button type="button" onclick="setQuickPlace('สำนักงานศึกษาธิการจังหวัดเชียงใหม่')" class="text-[10px] px-2 py-0.5 bg-white hover:bg-slate-200 border border-slate-200 rounded-md text-slate-700 transition">ศธจ.เชียงใหม่</button>
@@ -610,7 +523,6 @@
               </div>
             </div>
 
-            <!-- Live Google Map Iframe -->
             <div id="googleMapWrapper" class="w-full h-44 sm:h-48 rounded-xl overflow-hidden border border-slate-300 shadow-inner bg-slate-200 relative mt-2">
               <iframe id="googleMapIframe" class="w-full h-full border-0" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=%E0%B8%AA%E0%B8%B3%E0%B8%99%E0%B8%B1%E0%B8%81%E0%B8%87%E0%B8%B2%E0%B8%99%E0%B8%A8%E0%B8%B6%E0%B8%81%E0%B8%A9%E0%B8%B2%E0%B8%98%E0%B8%B4%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%88%E0%B8%B1%E0%B8%87%E0%B8%AB%E0%B8%A7%E0%B8%B1%E0%B8%94%E0%B9%80%E0%B8%8A%E0%B8%B5%E0%B8%A2%E0%B8%87%E0%B9%83%E0%B8%8HM&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
               <div id="onlinePlaceHint" class="hidden absolute inset-0 bg-slate-900/85 text-white flex flex-col items-center justify-center text-center p-3">
@@ -619,33 +531,25 @@
                 <span class="text-[10px] text-slate-300">ระบบบันทึกเป็น "ออนไลน์ (Online)"</span>
               </div>
             </div>
-
           </div>
-
         </div>
 
-        <!-- BOTTOM SECTION: LINKS & RESOURCES (5 HORIZONTAL CARDS IN EXACT USER-REQUESTED ORDER) -->
+        <!-- BOTTOM SECTION: LINKS & RESOURCES -->
         <div class="space-y-2 bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80">
           <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5 pb-1 border-b border-slate-200">
             <i class="fa-solid fa-link text-slate-600"></i> ลิงก์ระบบที่เกี่ยวข้อง (System URLs & Resources)
           </h4>
-
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 pt-1">
             
-            <!-- 1. Link Registration (ลิงก์สมัครอบรม - Default: เปิด) -->
+            <!-- 1. Registration -->
             <div id="regCardContainer" class="bg-white p-3 rounded-xl border border-slate-200 space-y-1.5 transition">
               <div class="flex items-center justify-between gap-1">
                 <label class="block font-semibold text-xs text-blue-800 flex items-center gap-1 truncate">
                   <i class="fa-solid fa-user-plus"></i> ลิงก์สมัครอบรม
                 </label>
-                <!-- Toggle Button (เปิด / ปิด) - Default เปิด -->
                 <div class="flex items-center bg-slate-100 p-0.5 rounded-lg text-[10px] font-semibold border border-slate-200 shrink-0">
-                  <button type="button" onclick="toggleRegistrationOption(true)" id="btnRegOn" class="px-2 py-0.5 rounded-md bg-blue-600 text-white font-semibold transition shadow-2xs">
-                    เปิด
-                  </button>
-                  <button type="button" onclick="toggleRegistrationOption(false)" id="btnRegOff" class="px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition">
-                    ปิด
-                  </button>
+                  <button type="button" onclick="toggleRegistrationOption(true)" id="btnRegOn" class="px-2 py-0.5 rounded-md bg-blue-600 text-white font-semibold transition shadow-2xs">เปิด</button>
+                  <button type="button" onclick="toggleRegistrationOption(false)" id="btnRegOff" class="px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition">ปิด</button>
                 </div>
               </div>
               <div id="regInputArea" class="space-y-1">
@@ -656,20 +560,15 @@
               </div>
             </div>
 
-            <!-- 2. Link Names (ลิงก์รายชื่อผู้สมัคร - Default: เปิด) -->
+            <!-- 2. Names -->
             <div id="nameCardContainer" class="bg-white p-3 rounded-xl border border-slate-200 space-y-1.5 transition">
               <div class="flex items-center justify-between gap-1">
                 <label class="block font-semibold text-xs text-amber-800 flex items-center gap-1 truncate">
                   <i class="fa-solid fa-list-check"></i> ลิงก์รายชื่อผู้สมัคร
                 </label>
-                <!-- Toggle Button (เปิด / ปิด) - Default เปิด -->
                 <div class="flex items-center bg-slate-100 p-0.5 rounded-lg text-[10px] font-semibold border border-slate-200 shrink-0">
-                  <button type="button" onclick="toggleNameOption(true)" id="btnNameOn" class="px-2 py-0.5 rounded-md bg-amber-600 text-white font-semibold transition shadow-2xs">
-                    เปิด
-                  </button>
-                  <button type="button" onclick="toggleNameOption(false)" id="btnNameOff" class="px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition">
-                    ปิด
-                  </button>
+                  <button type="button" onclick="toggleNameOption(true)" id="btnNameOn" class="px-2 py-0.5 rounded-md bg-amber-600 text-white font-semibold transition shadow-2xs">เปิด</button>
+                  <button type="button" onclick="toggleNameOption(false)" id="btnNameOff" class="px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition">ปิด</button>
                 </div>
               </div>
               <div id="nameInputArea" class="space-y-1">
@@ -680,20 +579,15 @@
               </div>
             </div>
 
-            <!-- 3. Link Materials (ลิงก์เอกสาร 2 URL - Default: ปิด) -->
+            <!-- 3. Materials -->
             <div id="matCardContainer" class="bg-white p-3 rounded-xl border border-slate-200 space-y-1.5 transition">
               <div class="flex items-center justify-between gap-1">
                 <label class="block font-semibold text-xs text-purple-800 flex items-center gap-1 truncate">
                   <i class="fa-solid fa-file-lines"></i> ลิงก์เอกสาร (2 URL)
                 </label>
-                <!-- Toggle Button (เปิด / ปิด) - Default ปิด -->
                 <div class="flex items-center bg-slate-100 p-0.5 rounded-lg text-[10px] font-semibold border border-slate-200 shrink-0">
-                  <button type="button" onclick="toggleMaterialOption(true)" id="btnMatOn" class="px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition">
-                    เปิด
-                  </button>
-                  <button type="button" onclick="toggleMaterialOption(false)" id="btnMatOff" class="px-2 py-0.5 rounded-md bg-rose-600 text-white font-semibold transition shadow-2xs">
-                    ปิด
-                  </button>
+                  <button type="button" onclick="toggleMaterialOption(true)" id="btnMatOn" class="px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition">เปิด</button>
+                  <button type="button" onclick="toggleMaterialOption(false)" id="btnMatOff" class="px-2 py-0.5 rounded-md bg-rose-600 text-white font-semibold transition shadow-2xs">ปิด</button>
                 </div>
               </div>
               <div id="matInputArea" class="space-y-1 hidden">
@@ -705,60 +599,47 @@
               </div>
             </div>
 
-            <!-- 4. Link Recheck (ลิงก์ตรวจสอบความถูกต้อง - Default: ปิด) -->
+            <!-- 4. Recheck -->
             <div id="recheckCardContainer" class="bg-white p-3 rounded-xl border border-slate-200 space-y-1.5 transition">
               <div class="flex items-center justify-between gap-1">
                 <label class="block font-semibold text-xs text-teal-800 flex items-center gap-1 truncate">
                   <i class="fa-solid fa-user-check"></i> ตรวจความถูกต้อง
                 </label>
-                <!-- Toggle Button (เปิด / ปิด) - Default ปิด -->
                 <div class="flex items-center bg-slate-100 p-0.5 rounded-lg text-[10px] font-semibold border border-slate-200 shrink-0">
-                  <button type="button" onclick="toggleRecheckOption(true)" id="btnRecheckOn" class="px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition">
-                    เปิด
-                  </button>
-                  <button type="button" onclick="toggleRecheckOption(false)" id="btnRecheckOff" class="px-2 py-0.5 rounded-md bg-rose-600 text-white font-semibold transition shadow-2xs">
-                    ปิด
-                  </button>
+                  <button type="button" onclick="toggleRecheckOption(true)" id="btnRecheckOn" class="px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition">เปิด</button>
+                  <button type="button" onclick="toggleRecheckOption(false)" id="btnRecheckOff" class="px-2 py-0.5 rounded-md bg-rose-600 text-white font-semibold transition shadow-2xs">ปิด</button>
                 </div>
               </div>
               <div id="recheckInputArea" class="space-y-1 hidden">
-                <input type="url" id="formLinkRecheck" placeholder="https://docs.google.com/..." class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-teal-600 bg-slate-50/50" title="ลิงก์ตรวจสอบความถูกต้องของรายชื่อ (บันทึกลง Column L: Link recheck)">
+                <input type="url" id="formLinkRecheck" placeholder="https://docs.google.com/..." class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-teal-600 bg-slate-50/50">
               </div>
               <div id="recheckDisabledNotice" class="py-1 px-2 text-center bg-slate-50 rounded-lg border border-slate-200/60">
                 <span class="text-[11px] text-slate-400 font-medium">🚫 ปิดตรวจความถูกต้อง</span>
               </div>
             </div>
 
-            <!-- 5. Link Certificate with Open/Close Toggle (Default: ปิด) -->
+            <!-- 5. Certificate -->
             <div id="certCardContainer" class="bg-white p-3 rounded-xl border border-slate-200 space-y-1.5 transition">
               <div class="flex items-center justify-between gap-1">
                 <label class="block font-semibold text-xs text-emerald-800 flex items-center gap-1 truncate">
                   <i class="fa-solid fa-award"></i> ลิงก์รับเกียรติบัตร
                 </label>
-                <!-- Toggle Button (เปิด / ปิด) - Default ปิด -->
                 <div class="flex items-center bg-slate-100 p-0.5 rounded-lg text-[10px] font-semibold border border-slate-200 shrink-0">
-                  <button type="button" onclick="toggleCertificateOption(true)" id="btnCertOn" class="px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition">
-                    เปิด
-                  </button>
-                  <button type="button" onclick="toggleCertificateOption(false)" id="btnCertOff" class="px-2 py-0.5 rounded-md bg-rose-600 text-white font-semibold transition shadow-2xs">
-                    ปิด
-                  </button>
+                  <button type="button" onclick="toggleCertificateOption(true)" id="btnCertOn" class="px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition">เปิด</button>
+                  <button type="button" onclick="toggleCertificateOption(false)" id="btnCertOff" class="px-2 py-0.5 rounded-md bg-rose-600 text-white font-semibold transition shadow-2xs">ปิด</button>
                 </div>
               </div>
-              <!-- Input Area (Hidden by Default) -->
               <div id="certInputArea" class="space-y-1 hidden">
                 <input type="url" id="formLinkCertificated" value="" placeholder="https://script.google.com/..." class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-emerald-600 bg-slate-50/50 text-slate-700">
               </div>
-              <!-- Notice when disabled (Shown by Default) -->
               <div id="certDisabledNotice" class="py-1 px-2 text-center bg-slate-50 rounded-lg border border-slate-200/60">
                 <span class="text-[11px] text-slate-400 font-medium">🚫 ไม่มีเกียรติบัตร</span>
               </div>
             </div>
-
           </div>
         </div>
 
-        <!-- POST-TRAINING OUTCOMES & SUMMARIES (ผลการอบรม & การถอดบทเรียน) -->
+        <!-- POST-TRAINING OUTCOMES & SUMMARIES -->
         <div class="space-y-2 bg-gradient-to-r from-rose-50/50 via-indigo-50/40 to-slate-50/60 p-4 rounded-2xl border border-indigo-100/80">
           <div class="flex items-center justify-between pb-1 border-b border-indigo-100/60">
             <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
@@ -768,57 +649,42 @@
               บันทึกลง Column M & N
             </span>
           </div>
-
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-            
-            <!-- Link Padlet Summary (Column M: Link padlet summary - Default: ปิด) -->
             <div id="padletCardContainer" class="bg-white p-3 rounded-xl border border-slate-200 space-y-1.5 transition">
               <div class="flex items-center justify-between gap-1">
                 <label class="block font-semibold text-xs text-rose-800 flex items-center gap-1 truncate">
                   <i class="fa-solid fa-comments text-rose-600"></i> ลิงก์สรุปความคิดเห็น (Padlet / Google Docs)
                 </label>
-                <!-- Toggle Button (เปิด / ปิด) - Default ปิด -->
                 <div class="flex items-center bg-slate-100 p-0.5 rounded-lg text-[10px] font-semibold border border-slate-200 shrink-0">
-                  <button type="button" onclick="togglePadletOption(true)" id="btnPadletOn" class="px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition">
-                    เปิด
-                  </button>
-                  <button type="button" onclick="togglePadletOption(false)" id="btnPadletOff" class="px-2 py-0.5 rounded-md bg-rose-600 text-white font-semibold transition shadow-2xs">
-                    ปิด
-                  </button>
+                  <button type="button" onclick="togglePadletOption(true)" id="btnPadletOn" class="px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition">เปิด</button>
+                  <button type="button" onclick="togglePadletOption(false)" id="btnPadletOff" class="px-2 py-0.5 rounded-md bg-rose-600 text-white font-semibold transition shadow-2xs">ปิด</button>
                 </div>
               </div>
               <div id="padletInputArea" class="space-y-1 hidden">
-                <input type="url" id="formLinkPadletSummary" placeholder="https://docs.google.com/document/d/..." class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50/50" title="ลิงก์สรุปความคิดเห็นของเพื่อนครูจาก Padlet (Google Docs)">
+                <input type="url" id="formLinkPadletSummary" placeholder="https://docs.google.com/document/d/..." class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50/50">
               </div>
               <div id="padletDisabledNotice" class="py-1 px-2 text-center bg-slate-50 rounded-lg border border-slate-200/60">
                 <span class="text-[11px] text-slate-400 font-medium">🚫 ยังไม่มีสรุปความคิดเห็น</span>
               </div>
             </div>
 
-            <!-- Link Transcript Summary (Column N: Link transcript summary - Default: ปิด) -->
             <div id="transcriptCardContainer" class="bg-white p-3 rounded-xl border border-slate-200 space-y-1.5 transition">
               <div class="flex items-center justify-between gap-1">
-                <label class="block font-semibold text-xs text-indigo-800 flex items-center gap-1 truncate" title="สำหรับการอบรมรูปแบบ Online หรือ Hybrid">
+                <label class="block font-semibold text-xs text-indigo-800 flex items-center gap-1 truncate">
                   <i class="fa-solid fa-microphone-lines text-indigo-600"></i> ลิงก์ถอดเทปสรุปภาพรวม (Google Docs)
                 </label>
-                <!-- Toggle Button (เปิด / ปิด) - Default ปิด -->
                 <div class="flex items-center bg-slate-100 p-0.5 rounded-lg text-[10px] font-semibold border border-slate-200 shrink-0">
-                  <button type="button" onclick="toggleTranscriptOption(true)" id="btnTranscriptOn" class="px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition">
-                    เปิด
-                  </button>
-                  <button type="button" onclick="toggleTranscriptOption(false)" id="btnTranscriptOff" class="px-2 py-0.5 rounded-md bg-rose-600 text-white font-semibold transition shadow-2xs">
-                    ปิด
-                  </button>
+                  <button type="button" onclick="toggleTranscriptOption(true)" id="btnTranscriptOn" class="px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition">เปิด</button>
+                  <button type="button" onclick="toggleTranscriptOption(false)" id="btnTranscriptOff" class="px-2 py-0.5 rounded-md bg-rose-600 text-white font-semibold transition shadow-2xs">ปิด</button>
                 </div>
               </div>
               <div id="transcriptInputArea" class="space-y-1 hidden">
-                <input type="url" id="formLinkTranscriptSummary" placeholder="https://docs.google.com/document/d/..." class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 bg-slate-50/50" title="ลิงก์ถอดเทปสรุปภาพรวมการอบรมจากคลิปเสียง (Google Docs)">
+                <input type="url" id="formLinkTranscriptSummary" placeholder="https://docs.google.com/document/d/..." class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-indigo-500 bg-slate-50/50">
               </div>
               <div id="transcriptDisabledNotice" class="py-1 px-2 text-center bg-slate-50 rounded-lg border border-slate-200/60">
                 <span class="text-[11px] text-slate-400 font-medium">🚫 ยังไม่มีการถอดเทปสรุป</span>
               </div>
             </div>
-
           </div>
         </div>
 
@@ -831,21 +697,18 @@
             <i class="fa-solid fa-cloud-arrow-up"></i> บันทึกลง Google Sheet
           </button>
         </div>
-
       </form>
-
     </div>
   </div>
 
   <!-- ==================== JAVASCRIPT LOGIC ==================== -->
   <script>
-    // State Variables
     let currentAdminPin = null;
     let allCoursesData = [];
-    let sortAscending = false; // false = newest date first
+    let sortAscending = false;
     let mapDebounceTimer = null;
     
-    // Toggle States for Resources (Default: Registration & Names = true, Others = false)
+    // Toggle States for Resources
     let isRegistrationEnabled = true;
     let isNameEnabled = true;
     let isMaterialEnabled = false;
@@ -937,7 +800,6 @@
       const inputArea = document.getElementById('certInputArea');
       const notice = document.getElementById('certDisabledNotice');
       const inputField = document.getElementById('formLinkCertificated');
-
       if (enable) {
         if (btnOn) btnOn.className = 'px-2 py-0.5 rounded-md bg-emerald-600 text-white font-semibold transition shadow-2xs';
         if (btnOff) btnOff.className = 'px-2 py-0.5 rounded-md text-slate-500 hover:text-slate-800 transition';
@@ -1000,7 +862,6 @@
       return (typeof google !== 'undefined' && google.script && google.script.run);
     }
 
-    // Helper to set select dropdown or dynamically add option if not in 30-min intervals
     function setSelectValueOrAdd(selectElem, val) {
       if (!selectElem || !val) return;
       let exists = false;
@@ -1016,14 +877,12 @@
       selectElem.value = val;
     }
 
-    // 🕒 Init 24-Hour Time Dropdowns
     function initTime24Dropdowns() {
       const startSelect = document.getElementById('formStartTime24');
       const endSelect = document.getElementById('formEndTime24');
       if (!startSelect || !endSelect) return;
       startSelect.innerHTML = '';
       endSelect.innerHTML = '';
-
       for (let h = 0; h < 24; h++) {
         for (let m of ['00', '30']) {
           const hh = h.toString().padStart(2, '0');
@@ -1036,7 +895,6 @@
       endSelect.value = "16:00";
     }
 
-    // 📅 Thai Date Formatter & Parser
     const THAI_MONTHS = [
       "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
       "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
@@ -1052,20 +910,15 @@
       return `${day} ${month} ${year}`;
     }
 
-    // Robust parser to extract exact ISO date, start time, and end time from saved date string
     function parseScheduleDetails(dateStr) {
       let parsedIsoDate = '';
       let parsedStartTime = '13:00';
       let parsedEndTime = '16:00';
-
       if (!dateStr || typeof dateStr !== 'string') {
         const todayIso = new Date().toISOString().split('T')[0];
         return { isoDate: todayIso, startTime: parsedStartTime, endTime: parsedEndTime };
       }
-
       const cleanStr = dateStr.trim();
-
-      // 1. Extract Times: e.g. "เวลา 13.00 - 16.00 น." or "13:00 - 16:00" or "08.30-16.30"
       const timeMatch = cleanStr.match(/(\d{1,2})[.:](\d{2})\s*(?:-|ถึง|to)\s*(\d{1,2})[.:](\d{2})/i);
       if (timeMatch) {
         const sh = timeMatch[1].padStart(2, '0');
@@ -1076,8 +929,6 @@
         parsedEndTime = `${eh}:${em}`;
       }
 
-      // 2. Extract Date:
-      // 2.1 Thai month format: e.g. "1 ตุลาคม 2569" or "23 กันยายน 2569"
       let matchedThaiMonth = false;
       for (let m = 0; m < THAI_MONTHS.length; m++) {
         const monthName = THAI_MONTHS[m];
@@ -1089,9 +940,7 @@
           
           const yearMatch = parts[1].match(/(\d{4})/);
           let year = yearMatch ? parseInt(yearMatch[1], 10) : 2569;
-          if (year > 2400) {
-            year -= 543;
-          }
+          if (year > 2400) year -= 543;
           const yyyy = year.toString().padStart(4, '0');
           const mm = (m + 1).toString().padStart(2, '0');
           const dd = day.toString().padStart(2, '0');
@@ -1099,8 +948,6 @@
           break;
         }
       }
-
-      // 2.2 Check ISO format YYYY-MM-DD
       if (!matchedThaiMonth) {
         const isoMatch = cleanStr.match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
         if (isoMatch) {
@@ -1111,7 +958,6 @@
           const dd = parseInt(isoMatch[3], 10).toString().padStart(2, '0');
           parsedIsoDate = `${yyyy}-${mm}-${dd}`;
         } else {
-          // 2.3 Check DD/MM/YYYY or DD-MM-YYYY format
           const dmyMatch = cleanStr.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
           if (dmyMatch) {
             let y = parseInt(dmyMatch[3], 10);
@@ -1123,11 +969,9 @@
           }
         }
       }
-
       if (!parsedIsoDate) {
         parsedIsoDate = new Date().toISOString().split('T')[0];
       }
-
       return { isoDate: parsedIsoDate, startTime: parsedStartTime, endTime: parsedEndTime };
     }
 
@@ -1156,19 +1000,16 @@
       preview.innerText = dateVal ? `(${formatThaiDateString(dateVal)})` : '';
     }
 
-    // 🗺️ Google Maps Embed & Search
     function updateGoogleMapEmbed(query) {
       const iframe = document.getElementById('googleMapIframe');
       const openBtn = document.getElementById('openGMapBtn');
       const onlineHint = document.getElementById('onlinePlaceHint');
       const cleanQuery = (query || '').trim();
-
       if (!cleanQuery || cleanQuery === 'ออนไลน์ (Online)' || cleanQuery.toLowerCase() === 'online') {
         if (onlineHint) onlineHint.classList.remove('hidden');
         if (openBtn) openBtn.href = 'https://www.google.com/maps';
         return;
       }
-
       if (onlineHint) onlineHint.classList.add('hidden');
       
       const searchQuery = (cleanQuery.includes('เชียงใหม่') || cleanQuery.startsWith('http')) 
@@ -1177,7 +1018,6 @@
       
       const embedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(searchQuery)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
       if (iframe) iframe.src = embedUrl;
-
       if (openBtn) {
         openBtn.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cleanQuery)}`;
       }
@@ -1213,14 +1053,12 @@
       updateGoogleMapEmbed(placeInput.value);
     }
 
-    // 🚀 Robust Data Fetching (GAS Engine + Direct Google Sheets GViz Multi-Tier)
     async function fetchFromGoogleSheetsDirect() {
       const endpoints = [
         `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&t=${Date.now()}`,
         `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=${encodeURIComponent('Training Course')}&tqx=out:json&t=${Date.now()}`,
         `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?gid=0&tqx=out:json&t=${Date.now()}`
       ];
-
       for (const url of endpoints) {
         try {
           const res = await fetch(url);
@@ -1230,21 +1068,17 @@
           if (!jsonMatch || !jsonMatch[1]) continue;
           const data = JSON.parse(jsonMatch[1]);
           if (!data.table || !data.table.rows || data.table.rows.length === 0) continue;
-
           const courses = [];
           const rows = data.table.rows.map(r => (r.c || []).map(cell => (cell && cell.v !== null && cell.v !== undefined) ? cell.v : ''));
           const startIdx = (rows.length > 0 && String(rows[0][1]).trim() === 'Topic') ? 1 : 0;
-
           for (let i = startIdx; i < rows.length; i++) {
             const row = rows[i];
             if (!row || !row[1] || String(row[1]).trim() === '' || String(row[1]).trim() === 'Topic') continue;
-
             const rawMaterials = String(row[7] || '');
             const materialLinks = rawMaterials
               .split(/[\n,]+/)
               .map(s => s.trim())
               .filter(s => s.startsWith('http://') || s.startsWith('https://'));
-
             courses.push({
               rowId: i + 1,
               timestamp: row[0] || '',
@@ -1264,7 +1098,6 @@
               linkTranscriptSummary: String(row[13] || '').trim()
             });
           }
-
           if (courses.length > 0) {
             return { success: true, courses: courses };
           }
@@ -1276,14 +1109,12 @@
     }
 
     async function fetchData() {
-      // Spinning icons on refresh buttons
       document.querySelectorAll('#headerRefreshBtn i, #bannerRefreshBtn i').forEach(icon => {
         icon.classList.add('fa-spin');
       });
-
       document.getElementById('loading').classList.remove('hidden');
       document.getElementById('contentArea').classList.add('hidden');
-
+      
       const onFetchComplete = () => {
         document.querySelectorAll('#headerRefreshBtn i, #bannerRefreshBtn i').forEach(icon => {
           icon.classList.remove('fa-spin');
@@ -1356,26 +1187,21 @@
         return;
       }
       document.getElementById('contentArea').classList.remove('hidden');
-
       allCoursesData = res.courses || [];
-
-      // Update counters in Header Banner
+      
       const openCount = allCoursesData.filter(c => c.status === 'เปิดการอบรม' || c.status === 'open').length;
       const completedCount = allCoursesData.length - openCount;
       
       document.getElementById('statCourseCount').innerText = `${allCoursesData.length} หลักสูตร`;
       document.getElementById('statOpenCount').innerText = openCount;
       document.getElementById('statCompletedCount').innerText = completedCount;
-
       filterCourses();
     }
 
-    // 📄 Pagination & Filtering State (5 courses per page)
     const PAGE_SIZE = 5;
     let currentPage = 1;
     let currentFilteredCourses = [];
 
-    // 🔍 Search, Filter, and Chronological Sort
     function toggleSortOrder() {
       sortAscending = !sortAscending;
       const label = document.getElementById('sortOrderLabel');
@@ -1407,18 +1233,15 @@
           (c.place && c.place.toLowerCase().includes(search));
         
         const matchType = (typeFilter === 'all') || (c.type === typeFilter);
-
         let matchStatus = true;
         if (statusFilter === 'open') {
           matchStatus = (c.status === 'เปิดการอบรม' || c.status === 'open');
         } else if (statusFilter === 'completed') {
           matchStatus = (c.status === 'อบรมเสร็จแล้ว' || c.status === 'closed' || c.status === 'close' || c.status === 'completed');
         }
-
         return matchSearch && matchType && matchStatus;
       });
 
-      // Sort Chronologically by Date
       currentFilteredCourses.sort((a, b) => {
         const timeA = parseThaiDateToTimestamp(a.date);
         const timeB = parseThaiDateToTimestamp(b.date);
@@ -1428,18 +1251,14 @@
       if (!keepPage) {
         currentPage = 1;
       }
-
       renderCurrentPage();
     }
 
-    // 📑 Render Current Page (5 Courses per page with Page Summary & Motion)
     function renderCurrentPage() {
       const totalItems = currentFilteredCourses.length;
       const totalPages = Math.ceil(totalItems / PAGE_SIZE) || 1;
-
       if (currentPage > totalPages) currentPage = totalPages;
       if (currentPage < 1) currentPage = 1;
-
       const startIndex = (currentPage - 1) * PAGE_SIZE;
       const endIndex = Math.min(startIndex + PAGE_SIZE, totalItems);
       const pageCourses = currentFilteredCourses.slice(startIndex, endIndex);
@@ -1447,7 +1266,7 @@
       const listContainer = document.getElementById('courseList');
       if (listContainer) {
         listContainer.classList.remove('animate-page-slide');
-        void listContainer.offsetWidth; // trigger reflow for smooth re-animation
+        void listContainer.offsetWidth;
         listContainer.classList.add('animate-page-slide');
       }
 
@@ -1465,7 +1284,6 @@
       const nextBtn = document.getElementById('nextPageBtn');
       const pageNumBtns = document.getElementById('pageNumberButtons');
 
-      // Top Page Summary Elements
       const summaryCurrentBadge = document.getElementById('pageSummaryCurrentBadge');
       const summaryRange = document.getElementById('pageSummaryRange');
       const summaryTotal = document.getElementById('pageSummaryTotal');
@@ -1480,7 +1298,6 @@
         return;
       }
 
-      // Show and update top summary banner
       if (pageSummaryBanner) {
         pageSummaryBanner.classList.remove('hidden');
         pageSummaryBanner.classList.add('flex');
@@ -1493,17 +1310,12 @@
       if (pagContainer) {
         pagContainer.classList.remove('hidden');
       }
-
       if (pageRangeText) pageRangeText.innerText = `${startIndex + 1} - ${endIndex}`;
       if (totalCoursesText) totalCoursesText.innerText = totalItems;
       if (pageCountSummaryText) pageCountSummaryText.innerText = `${currentPageCount} courses on this page (${currentPageCount} หลักสูตรในหน้านี้)`;
 
-      if (prevBtn) {
-        prevBtn.disabled = (currentPage <= 1);
-      }
-      if (nextBtn) {
-        nextBtn.disabled = (currentPage >= totalPages);
-      }
+      if (prevBtn) prevBtn.disabled = (currentPage <= 1);
+      if (nextBtn) nextBtn.disabled = (currentPage >= totalPages);
 
       if (pageNumBtns) {
         pageNumBtns.innerHTML = '';
@@ -1593,23 +1405,40 @@
           card.className = `card-academic course-card rounded-2xl p-4 sm:p-5 border shadow-2xs space-y-3.5 course-card-closed-${isEven ? '0' : '1'}`;
         }
 
-        const seqBadge = `<span class="badge-seq-vibrant" title="หลักสูตรลำดับที่ ${itemSeqNumber}">
-          <i class="fa-solid fa-hashtag text-[11px] opacity-85"></i> ลำดับที่ ${itemSeqNumber}
-        </span>`;
+        // 🌟 ป้ายลำดับที่แบบใหม่: สีสดใส เด่นชัด + Animated NEW Icon สำหรับหลักสูตรที่กำลังเปิดอบรม
+        let seqBadge = '';
+        if (isOpen) {
+          seqBadge = `
+            <div class="inline-flex items-center gap-1.5">
+              <!-- Animated NEW Icon (Flaticon Animated Icon พร้อม Fallback) -->
+              <div class="inline-flex items-center shrink-0 animate-badge-pop" title="เปิดการอบรมใหม่">
+                <img 
+                  src="https://cdn-icons-gif.flaticon.com/16767/16767133.gif" 
+                  alt="NEW" 
+                  class="w-8 h-8 sm:w-9 sm:h-9 object-contain drop-shadow-sm -mr-1"
+                  onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white shadow-sm animate-pulse mr-1\'><i class=\'fa-solid fa-sparkles text-amber-300 text-[9px]\'></i>NEW</span>';"
+                />
+              </div>
+              <!-- ปุ่มลำดับที่ สดใส เด่นตา (Gradient Blue-Indigo with Glow) -->
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs sm:text-[13px] font-extrabold bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 text-white shadow-md shadow-blue-500/25 border border-white/30 tracking-tight" title="หลักสูตรลำดับที่ ${itemSeqNumber}">
+                <i class="fa-solid fa-bookmark text-amber-300 text-[11px]"></i>
+                <span>ลำดับที่ ${itemSeqNumber}</span>
+              </span>
+            </div>
+          `;
+        } else {
+          // หลักสูตรที่เสร็จสิ้นแล้ว: โทนสีสุภาพ ชัดเจน สบายตา
+          seqBadge = `
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs sm:text-[13px] font-bold bg-slate-700 hover:bg-slate-800 text-white shadow-xs border border-slate-600/40 tracking-tight" title="หลักสูตรลำดับที่ ${itemSeqNumber}">
+              <i class="fa-regular fa-circle-check text-slate-300 text-[11px]"></i>
+              <span>ลำดับที่ ${itemSeqNumber}</span>
+            </span>
+          `;
+        }
 
         const statusBadge = isOpen 
-          ? `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-2xs">
-              <img 
-                src="https://lh3.googleusercontent.com/d/1HNvyeVBO9JWw_d_Tu1or0YebbRc0TdWY" 
-                alt="Active" 
-                class="w-4 h-4 object-contain inline-block shrink-0 -my-0.5" 
-                onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=1HNvyeVBO9JWw_d_Tu1or0YebbRc0TdWY&sz=w200';" 
-              />
-              เปิดการอบรม
-            </span>`
-          : `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
-              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> อบรมเสร็จแล้ว
-            </span>`;
+          ? '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> เปิดการอบรม</span>'
+          : '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> อบรมเสร็จแล้ว</span>';
 
         let typeBadge = '';
         if (item.type === 'online') {
@@ -1620,7 +1449,6 @@
           typeBadge = '<span class="text-xs text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-lg font-medium border border-purple-200/70"><i class="fa-solid fa-rotate mr-1"></i>Hybrid</span>';
         }
 
-        // Place Link on Google Maps
         let placeDisplay = '';
         if (item.place && item.place !== 'ออนไลน์ (Online)') {
           const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.place)}`;
@@ -1637,7 +1465,6 @@
             </span>`;
         }
 
-        // Action Buttons Setup (5 Buttons in User Order: 1. Registration, 2. Names, 3. Materials, 4. Recheck, 5. Certificate)
         const sanitizeUrl = (url) => {
           if (!url) return '';
           let u = String(url).trim();
@@ -1648,7 +1475,7 @@
           return u;
         };
 
-        // 1. Registration (สมัครอบรม)
+        // 1. Registration
         const regUrl = sanitizeUrl(item.linkRegistration);
         const hasReg = !!regUrl;
         const regBtn = hasReg
@@ -1659,7 +1486,7 @@
               <i class="fa-solid fa-user-plus text-[11px]"></i> สมัครอบรม
             </button>`;
 
-        // 2. Names (รายชื่อผู้สมัคร)
+        // 2. Names
         const nameUrl = sanitizeUrl(item.linkName);
         const hasNames = !!nameUrl;
         const nameBtn = hasNames
@@ -1670,7 +1497,7 @@
               <i class="fa-solid fa-list-check text-[11px]"></i> รายชื่อผู้สมัคร
             </button>`;
 
-        // 3. Materials (เอกสารประกอบ - Multi-URL Modal Support)
+        // 3. Materials
         const matLinks = (item.linkMaterials || []).map(sanitizeUrl).filter(Boolean);
         const hasMat = matLinks.length > 0;
         let matBtn = '';
@@ -1684,7 +1511,7 @@
           </button>`;
         }
 
-        // 4. Recheck (ตรวจความถูกต้อง - Column L: Link recheck)
+        // 4. Recheck
         const recheckUrl = sanitizeUrl(item.linkRecheck);
         const hasRecheck = !!recheckUrl;
         const recheckBtn = hasRecheck
@@ -1695,7 +1522,7 @@
               <i class="fa-solid fa-user-check text-[11px]"></i> ตรวจความถูกต้อง
             </button>`;
 
-        // 5. Certificate (รับเกียรติบัตร - Active vs Disabled badge)
+        // 5. Certificate
         const certUrl = sanitizeUrl(item.linkCertificated);
         const hasCert = !!certUrl;
         const certBtn = hasCert
@@ -1706,7 +1533,7 @@
               <i class="fa-solid fa-award text-[11px]"></i> ไม่มีเกียรติบัตร
             </button>`;
 
-        // 📑 Post-Training Outcomes (ผลการอบรม & การถอดบทเรียน: Padlet & Audio Transcript)
+        // Post-Training Outcomes
         const padletUrl = sanitizeUrl(item.linkPadlet || item.linkPadletSummary);
         const transcriptUrl = sanitizeUrl(item.linkSummary || item.linkTranscriptSummary);
         const hasPadlet = !!padletUrl;
@@ -1744,7 +1571,6 @@
           `;
         }
 
-        // Explicit Edit Course Button + Delete (For Admin)
         let adminActionTools = '';
         if (currentAdminPin) {
           adminActionTools = `
@@ -1763,7 +1589,6 @@
         }
 
         card.innerHTML = `
-          <!-- Badges & Meta Top Row -->
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div class="flex items-center gap-2 flex-wrap">
               ${seqBadge}
@@ -1779,24 +1604,12 @@
               </span>
             </div>
           </div>
-
-          <!-- Course Topic (with Animated Icon for Open Courses) -->
           <div>
-            <h3 class="text-base sm:text-lg font-bold text-slate-900 leading-snug tracking-tight flex items-start gap-2.5">
-              ${isOpen ? `
-                <img 
-                  src="https://lh3.googleusercontent.com/d/1HNvyeVBO9JWw_d_Tu1or0YebbRc0TdWY" 
-                  alt="เปิดการอบรม" 
-                  class="w-6 h-6 sm:w-7 sm:h-7 object-contain inline-block shrink-0 mt-0.5 filter drop-shadow-xs" 
-                  title="หลักสูตรกำลังเปิดการอบรม (เปิดรับสมัคร / กำลังดำเนินการ)" 
-                  onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=1HNvyeVBO9JWw_d_Tu1or0YebbRc0TdWY&sz=w200';" 
-                />` : ''}
-              <span class="flex-1">${item.topic}</span>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900 leading-snug tracking-tight">
+              ${item.topic}
             </h3>
             <div class="mt-1.5">${placeDisplay}</div>
           </div>
-
-          <!-- 5 Action Buttons Grid: 1. Registration, 2. Names, 3. Materials, 4. Recheck, 5. Certificate -->
           <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 pt-1 border-t border-slate-100">
             ${regBtn}
             ${nameBtn}
@@ -1804,26 +1617,20 @@
             ${recheckBtn}
             ${certBtn}
           </div>
-
           ${outcomeSection}
-
           ${adminActionTools}
         `;
-
         listContainer.appendChild(card);
       });
     }
 
-    // 📚 Materials Multi-Link Popup Modal
     function openMaterialsPopup(encodedJson) {
       const course = JSON.parse(decodeURIComponent(encodedJson));
       const links = course.linkMaterials || [];
-
       if (links.length === 1) {
         window.open(links[0], '_blank');
         return;
       }
-
       let html = `
         <div class="text-left space-y-2.5 pt-2">
           <p class="text-xs text-slate-600 font-medium">หลักสูตร: <strong>${course.topic}</strong></p>
@@ -1839,9 +1646,7 @@
             <i class="fa-solid fa-arrow-up-right-from-square text-purple-400 group-hover:text-purple-700"></i>
           </a>`;
       });
-
       html += `</div></div>`;
-
       Swal.fire({
         title: 'เอกสารประกอบการบรรยาย',
         html: html,
@@ -1850,7 +1655,6 @@
       });
     }
 
-    // 🛡️ Admin Verification & Modals
     function openAdminModal() {
       if (currentAdminPin) {
         Swal.fire({
@@ -1871,7 +1675,6 @@
         });
         return;
       }
-
       Swal.fire({
         title: 'ยืนยันสิทธิ์ผู้ดูแลระบบ',
         input: 'password',
@@ -1921,8 +1724,12 @@
       });
     }
 
-    // Open Horizontal Form for New Course
+    let saveInProgress = false;
+    let pendingSave = null;
+
     function openNewCourseForm() {
+      if (saveInProgress) return;
+      pendingSave = null;
       document.getElementById('courseForm').reset();
       document.getElementById('formRowId').value = '';
       document.getElementById('formOriginalTopic').value = '';
@@ -1945,7 +1752,6 @@
       document.getElementById('formLinkPadletSummary').value = '';
       document.getElementById('formLinkTranscriptSummary').value = '';
 
-      // Set Defaults: Registration & Names = เปิด, Others = ปิด
       toggleRegistrationOption(true);
       toggleNameOption(true);
       toggleMaterialOption(false);
@@ -1956,56 +1762,9 @@
       
       updateDatePreview();
       updateGoogleMapEmbed('ออนไลน์ (Online)');
-
       document.getElementById('courseModal').classList.remove('hidden');
     }
 
-    // Prompt Edit Course with PIN if not yet logged in
-    function promptEditCourse(encodedJson) {
-      if (currentAdminPin) {
-        editCourseEntry(encodedJson);
-      } else {
-        Swal.fire({
-          title: 'ยืนยันสิทธิ์ผู้ดูแลระบบ',
-          input: 'password',
-          inputLabel: 'กรุณากรอกรหัสผ่านเพื่อแก้ไขหลักสูตรนี้',
-          inputPlaceholder: 'ใส่รหัสผ่านผู้ดูแลระบบ',
-          showCancelButton: true,
-          confirmButtonText: 'เข้าสู่ระบบและแก้ไข',
-          cancelButtonText: 'ยกเลิก',
-          confirmButtonColor: '#0f172a'
-        }).then((res) => {
-          if (res.isConfirmed && res.value) {
-            const pin = res.value.trim();
-            if (isGasEnvironment()) {
-              google.script.run.withSuccessHandler((vRes) => {
-                if (vRes.success) {
-                  currentAdminPin = pin;
-                  document.getElementById('adminStatusBar').classList.remove('hidden');
-                  document.getElementById('adminBtnLabel').innerText = 'ออกจากระบบ';
-                  filterCourses();
-                  editCourseEntry(encodedJson);
-                } else {
-                  Swal.fire({ icon: 'error', title: 'รหัสผ่านไม่ถูกต้อง' });
-                }
-              }).verifyAdminPin(pin);
-            } else {
-              if (pin === '254782115') {
-                currentAdminPin = pin;
-                document.getElementById('adminStatusBar').classList.remove('hidden');
-                document.getElementById('adminBtnLabel').innerText = 'ออกจากระบบ';
-                filterCourses();
-                editCourseEntry(encodedJson);
-              } else {
-                Swal.fire({ icon: 'error', title: 'รหัสผ่านไม่ถูกต้อง' });
-              }
-            }
-          }
-        });
-      }
-    }
-
-    // Selector Modal for editing any course from Admin Bar
     function openEditCourseSelector() {
       if (allCoursesData.length === 0) {
         Swal.fire({ icon: 'info', title: 'ยังไม่มีหลักสูตรในระบบ', text: 'กรุณาบันทึกหลักสูตรใหม่ก่อน' });
@@ -2015,7 +1774,6 @@
       allCoursesData.forEach((c, idx) => {
         inputOptions[idx] = `${idx + 1}. ${c.topic} (${c.date})`;
       });
-
       Swal.fire({
         title: 'เลือกหลักสูตรที่ต้องการแก้ไข',
         input: 'select',
@@ -2035,43 +1793,38 @@
       });
     }
 
-    // Open Horizontal Form for Editing
     function editCourseEntry(encodedJson) {
+      if (saveInProgress) return;
+      pendingSave = null;
       const course = JSON.parse(decodeURIComponent(encodedJson));
       document.getElementById('courseForm').reset();
       document.getElementById('formRowId').value = course.rowId || '';
       document.getElementById('formOriginalTopic').value = course.topic || '';
       document.getElementById('modalFormTitle').innerText = `แก้ไขข้อมูลหลักสูตร: ${course.topic}`;
-
       document.getElementById('formTopic').value = course.topic || '';
       document.getElementById('formTarget').value = course.target || '';
       document.getElementById('formType').value = course.type || 'online';
       document.getElementById('formStatus').value = course.status || 'เปิดการอบรม';
       document.getElementById('formPlace').value = course.place || 'ออนไลน์ (Online)';
       
-      // 1. Registration
       const regVal = course.linkRegistration || '';
       document.getElementById('formLinkRegistration').value = regVal;
       toggleRegistrationOption(!!(regVal && (regVal.startsWith('http://') || regVal.startsWith('https://'))));
 
-      // 2. Names
       const nameVal = course.linkName || '';
       document.getElementById('formLinkName').value = nameVal;
       toggleNameOption(!!(nameVal && (nameVal.startsWith('http://') || nameVal.startsWith('https://'))));
 
-      // 3. Materials
       const links = course.linkMaterials || [];
       document.getElementById('formLinkMaterial1').value = links[0] || '';
       document.getElementById('formLinkMaterial2').value = links[1] || '';
       const hasMatUrls = links.some(u => u && (u.startsWith('http://') || u.startsWith('https://')));
       toggleMaterialOption(hasMatUrls);
 
-      // 4. Recheck
       const recheckVal = course.linkRecheck || '';
       document.getElementById('formLinkRecheck').value = recheckVal;
       toggleRecheckOption(!!(recheckVal && (recheckVal.startsWith('http://') || recheckVal.startsWith('https://'))));
 
-      // 5. Certificate
       const certVal = course.linkCertificated || '';
       if (certVal && (certVal.startsWith('http://') || certVal.startsWith('https://'))) {
         toggleCertificateOption(true);
@@ -2081,35 +1834,31 @@
         document.getElementById('formLinkCertificated').value = '';
       }
 
-      // 6. Link Padlet (Column M)
       const padletVal = course.linkPadlet || course.linkPadletSummary || '';
       document.getElementById('formLinkPadletSummary').value = padletVal;
       togglePadletOption(!!(padletVal && (padletVal.startsWith('http://') || padletVal.startsWith('https://'))));
 
-      // 7. Link Summary (Column N)
       const summaryVal = course.linkSummary || course.linkTranscriptSummary || '';
       document.getElementById('formLinkTranscriptSummary').value = summaryVal;
       toggleTranscriptOption(!!(summaryVal && (summaryVal.startsWith('http://') || summaryVal.startsWith('https://'))));
 
-      // Parse and retain exact saved Date, Start Time & End Time
       const schedule = parseScheduleDetails(course.date || '');
       document.getElementById('formDatePicker').value = schedule.isoDate;
       setSelectValueOrAdd(document.getElementById('formStartTime24'), schedule.startTime);
       setSelectValueOrAdd(document.getElementById('formEndTime24'), schedule.endTime);
       updateDatePreview();
       updateGoogleMapEmbed(course.place || 'ออนไลน์ (Online)');
-
       document.getElementById('courseModal').classList.remove('hidden');
     }
 
     function closeCourseModal() {
+      if (saveInProgress) return;
       document.getElementById('courseModal').classList.add('hidden');
     }
 
-    // 💾 Form Submission
     function handleFormSubmit(e) {
       e.preventDefault();
-
+      if (saveInProgress) return;
       const saveBtn = document.getElementById('saveCourseSubmitBtn');
       const rawDate = document.getElementById('formDatePicker').value;
       const formattedDate = formatThaiDateString(rawDate);
@@ -2117,16 +1866,13 @@
       const startTime24 = document.getElementById('formStartTime24').value.replace(':', '.');
       const endTime24 = document.getElementById('formEndTime24').value.replace(':', '.');
       const fullDateSchedule = `${formattedDate} เวลา ${startTime24} - ${endTime24} น.`;
-
       const typeVal = document.getElementById('formType').value;
       let finalPlace = document.getElementById('formPlace').value.trim();
       if (!finalPlace) {
         finalPlace = (typeVal === 'online') ? 'ออนไลน์ (Online)' : 'สำนักงานศึกษาธิการจังหวัดเชียงใหม่';
       }
-
       const finalPin = currentAdminPin || '254782115';
       
-      // Determine final URLs based on toggle states (If toggle is Off, submit empty string)
       const finalRegLink = isRegistrationEnabled ? document.getElementById('formLinkRegistration').value.trim() : '';
       const finalNameLink = isNameEnabled ? document.getElementById('formLinkName').value.trim() : '';
       const finalRecheckLink = isRecheckEnabled ? document.getElementById('formLinkRecheck').value.trim() : '';
@@ -2161,66 +1907,58 @@
         linkTranscriptSummary: finalSummaryLink
       };
 
+      // Reuse the same request ID when retrying an unchanged form.
+      const fingerprint = JSON.stringify(payload);
+      if (!pendingSave || pendingSave.fingerprint !== fingerprint) {
+        if (pendingSave) {
+          Swal.fire({ icon: 'warning', title: 'กรุณาตรวจสอบรายการเดิมก่อน', text: 'คำขอก่อนหน้าอาจบันทึกแล้ว กรุณารีเฟรชข้อมูลและตรวจสอบก่อนเริ่มแบบฟอร์มใหม่' });
+          return;
+        }
+        const requestId = (window.crypto && typeof window.crypto.randomUUID === 'function')
+          ? window.crypto.randomUUID()
+          : Array.from(window.crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
+        pendingSave = { fingerprint, requestId };
+      }
+      payload.requestId = pendingSave.requestId;
+      saveInProgress = true;
       saveBtn.disabled = true;
       saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังบันทึก...';
 
+      function unlockSave() {
+        saveInProgress = false;
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> บันทึกลง Google Sheet';
+      }
+      function onSaveResult(res) {
+        unlockSave();
+        if (res && res.success === true) {
+          pendingSave = null;
+          closeCourseModal();
+          Swal.fire({ icon: 'success', title: 'สำเร็จ', text: res.message, confirmButtonColor: '#0f172a' });
+          fetchData();
+        } else {
+          Swal.fire({ icon: 'error', title: 'ยังไม่ยืนยันการบันทึก', text: (res && res.message || 'ไม่พบผลตอบกลับจากระบบ') + ' กรุณาตรวจสอบข้อมูลก่อนเริ่มรายการใหม่' });
+        }
+      }
+      function onSaveFailure(err) {
+        unlockSave();
+        Swal.fire({ icon: 'warning', title: 'ยังไม่สามารถยืนยันผลบันทึก', text: 'คำขออาจบันทึกสำเร็จแล้ว กรุณาตรวจสอบ Google Sheet หรือกดบันทึกซ้ำโดยไม่แก้ไขข้อมูล ระบบจะใช้รหัสคำขอเดิม' });
+      }
       if (isGasEnvironment()) {
-        google.script.run
-          .withSuccessHandler((res) => {
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> บันทึกลง Google Sheet';
-            if (res.success) {
-              closeCourseModal();
-              Swal.fire({ icon: 'success', title: 'สำเร็จ', text: res.message, confirmButtonColor: '#0f172a' });
-              fetchData();
-            } else {
-              Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: res.message });
-            }
-          })
-          .withFailureHandler((err) => {
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> บันทึกลง Google Sheet';
-            Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: err.message });
-          })
-          .saveAdminEntry(payload);
+        google.script.run.withSuccessHandler(onSaveResult).withFailureHandler(onSaveFailure).saveAdminEntry(payload);
       } else {
-        const postData = JSON.stringify(payload);
+        // Never issue a second write through GET/no-cors after POST.
         fetch(gasApiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: postData
-        })
-        .then(() => {
-          saveBtn.disabled = false;
-          saveBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> บันทึกลง Google Sheet';
-          closeCourseModal();
-          Swal.fire({ 
-            icon: 'success', 
-            title: 'บันทึกข้อมูลเรียบร้อยแล้ว', 
-            text: 'ระบบได้ส่งข้อมูลไปยัง Google Sheet ใน tab Training Course เรียบร้อยแล้ว', 
-            confirmButtonColor: '#0f172a' 
-          });
-          setTimeout(fetchData, 1500);
-        })
-        .catch(err => {
-          const params = new URLSearchParams(payload).toString();
-          const getUrl = gasApiUrl.includes('?') ? `${gasApiUrl}&${params}` : `${gasApiUrl}?${params}`;
-          fetch(getUrl, { mode: 'no-cors' }).then(() => {
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> บันทึกลง Google Sheet';
-            closeCourseModal();
-            Swal.fire({ icon: 'success', title: 'บันทึกข้อมูลเรียบร้อยแล้ว', confirmButtonColor: '#0f172a' });
-            setTimeout(fetchData, 1500);
-          }).catch(finalErr => {
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> บันทึกลง Google Sheet';
-            Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: finalErr.toString() });
-          });
-        });
+          body: JSON.stringify(payload)
+        }).then(res => {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        }).then(onSaveResult).catch(onSaveFailure);
       }
     }
 
-    // 🗑️ Delete Course
     function deleteCourseEntry(encodedTopic) {
       const topic = decodeURIComponent(encodedTopic);
       Swal.fire({
@@ -2260,7 +1998,6 @@
       });
     }
 
-    // ⚙️ API Config Modal
     function openApiConfigModal() {
       Swal.fire({
         title: 'ตั้งค่า Google Apps Script Web App URL',
@@ -2282,7 +2019,6 @@
       });
     }
 
-    // 🔠 Font Scale
     function setFontScale(level) {
       const root = document.documentElement;
       document.querySelectorAll('#btn-font-sm, #btn-font-md, #btn-font-lg').forEach(btn => {
@@ -2301,7 +2037,6 @@
       }
     }
 
-    // 🎨 Academic Themes
     function setAppTheme(theme) {
       document.body.classList.remove('theme-academic', 'theme-forest', 'theme-warm');
       document.querySelectorAll('#btn-thm-academic, #btn-thm-forest, #btn-thm-warm').forEach(btn => {
@@ -2320,7 +2055,6 @@
       }
     }
 
-    // 🌟 On DOM Load
     window.addEventListener('DOMContentLoaded', () => {
       initTime24Dropdowns();
       fetchData();
