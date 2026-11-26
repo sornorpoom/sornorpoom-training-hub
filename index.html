@@ -1612,7 +1612,6 @@
 
     function openMaterialsPopup(encodedJson) {
       const course = JSON.parse(decodeURIComponent(encodedJson));
-      editIdentity = {topic: course.topic, requestId: course.saveRequestId || ""};
       const links = course.linkMaterials || [];
       if (links.length === 1) {
         window.open(links[0], '_blank');
@@ -1786,6 +1785,7 @@
       if (saveInProgress) return;
       pendingSave = null;
       const course = JSON.parse(decodeURIComponent(encodedJson));
+      editIdentity = {topic: course.topic, requestId: course.saveRequestId || ""};
       document.getElementById('courseForm').reset();
       document.getElementById('formRowId').value = course.rowId || '';
       document.getElementById('formOriginalTopic').value = course.topic || '';
@@ -1873,7 +1873,7 @@
 
       const payload = {
         action: 'saveEntry',
-        operation: editIdentity ? 'update' : 'create',
+        operation: document.getElementById('formOriginalTopic').value.trim() ? 'update' : 'create',
         originalRequestId: editIdentity ? editIdentity.requestId : '',
         adminPin: finalPin,
         pin: finalPin,
