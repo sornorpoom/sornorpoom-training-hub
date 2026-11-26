@@ -1080,7 +1080,8 @@
               .map(s => s.trim())
               .filter(s => s.startsWith('http://') || s.startsWith('https://'));
             courses.push({
-              rowId: i + 1,
+              rowId: null,
+              saveRequestId: String(row[14] || '').trim(),
               timestamp: row[0] || '',
               topic: String(row[1] || '').trim(),
               target: String(row[2] || 'ครูและบุคลากรทางการศึกษา').trim(),
@@ -1150,32 +1151,17 @@
           })
           .getTrainingPortalData();
       } else {
-        const directData = await fetchFromGoogleSheetsDirect();
-        if (directData && directData.courses && directData.courses.length > 0) {
+        try {
+          const fetchUrl = gasApiUrl + (gasApiUrl.includes('?') ? '&' : '?') + 'action=getData&t=' + Date.now();
+          const response = await fetch(fetchUrl);
+          const data = await response.json();
+          if (!response.ok || !data.success || !Array.isArray(data.courses)) throw new Error('API unavailable');
           onFetchComplete();
-          renderData(directData);
-        } else {
-          const fetchUrl = gasApiUrl.includes('?') 
-            ? `${gasApiUrl}&action=getData&t=${Date.now()}` 
-            : `${gasApiUrl}?action=getData&t=${Date.now()}`;
-          
-          fetch(fetchUrl)
-            .then(res => res.json())
-            .then(data => {
-              onFetchComplete();
-              if (data && data.courses && data.courses.length > 0) {
-                renderData(data);
-              } else if (directData) {
-                renderData(directData);
-              } else {
-                renderData({ success: true, courses: [] });
-              }
-            })
-            .catch(() => {
-              onFetchComplete();
-              if (directData) renderData(directData);
-              else renderData({ success: true, courses: [] });
-            });
+          renderData(data);
+        } catch (err) {
+          const fallback = await fetchFromGoogleSheetsDirect();
+          onFetchComplete();
+          renderData(fallback || {success:false, message:'ไม่สามารถโหลดข้อมูลหลักสูตรได้'});
         }
       }
     }
@@ -1626,6 +1612,7 @@
 
     function openMaterialsPopup(encodedJson) {
       const course = JSON.parse(decodeURIComponent(encodedJson));
+      editIdentity = {topic: course.topic, requestId: course.saveRequestId || ""};
       const links = course.linkMaterials || [];
       if (links.length === 1) {
         window.open(links[0], '_blank');
@@ -1726,10 +1713,12 @@
 
     let saveInProgress = false;
     let pendingSave = null;
+    let editIdentity = null;
 
     function openNewCourseForm() {
       if (saveInProgress) return;
       pendingSave = null;
+      editIdentity = null;
       document.getElementById('courseForm').reset();
       document.getElementById('formRowId').value = '';
       document.getElementById('formOriginalTopic').value = '';
@@ -1884,6 +1873,8 @@
 
       const payload = {
         action: 'saveEntry',
+        operation: editIdentity ? 'update' : 'create',
+        originalRequestId: editIdentity ? editIdentity.requestId : '',
         adminPin: finalPin,
         pin: finalPin,
         rowId: document.getElementById('formRowId').value,
